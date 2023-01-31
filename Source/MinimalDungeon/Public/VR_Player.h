@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include <HeadMountedDisplayTypes.h>
 #include "VR_Player.generated.h"
 
 UCLASS()
@@ -25,5 +26,32 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+		class UMotionControllerComponent* motionControllerRight;
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+		class UMotionControllerComponent* motionControllerLeft;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+		class UStaticMeshComponent* rightHand;
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+		class UStaticMeshComponent* leftHand;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+		class UTextRenderComponent* rightLog;
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+		class UTextRenderComponent* leftLog;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+		class UCameraComponent* cameraComponent;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+		class UStaticMeshComponent* HMD;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | MoudulSetting")
+		TEnumAsByte <EHMDTrackingOrigin::Type> trackingOrigin;
+
+
 
 };

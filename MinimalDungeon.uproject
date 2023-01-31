@@ -35,6 +35,10 @@
 				"Win64",
 				"Android"
 			]
+		},
+		{
+			"Name": "UdpMessaging",
+			"Enabled": false
 		}
 	],
 	"TargetPlatforms": [
