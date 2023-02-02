@@ -38,10 +38,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
 	class UStaticMeshComponent* leftHand;
 
-// 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
-// 	class UTextRenderComponent* rightLog;
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
-	class UTextRenderComponent* leftLog;
+	class UStaticMeshComponent* sword;
 
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
 	class UCameraComponent* cameraComponent;
@@ -61,8 +59,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "VR_Settings|Inputs")
 	TArray<class UInputAction*> rightInputs;
 
+	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
+	class UMoveComponent* moveComp;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
+	class UEquipComponent* equipComp;
 
 private:
-	void OnTriggerLeft(const struct FInputActionValue& value);
-	void RotateAxis(const struct FInputActionValue& value);
+
 };

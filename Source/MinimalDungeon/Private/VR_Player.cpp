@@ -13,6 +13,8 @@
 #include "InputAction.h"
 #include "InputMappingContext.h"
 #include "InputActionValue.h"
+#include "MoveComponent.h"
+#include "EquipComponent.h"
 
 // Sets default values
 AVR_Player::AVR_Player()
@@ -23,56 +25,51 @@ AVR_Player::AVR_Player()
 	cameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	cameraComponent->SetupAttachment(RootComponent);
 
-	motionControllerRight = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("motionControllerRight"));
 	motionControllerLeft = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("motionControllerLeft"));
-	motionControllerRight->SetupAttachment(RootComponent);
 	motionControllerLeft->SetupAttachment(RootComponent);
 	motionControllerLeft->MotionSource = "Left";
+
+	motionControllerRight = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("motionControllerRight"));
+	motionControllerRight->SetupAttachment(RootComponent);
 	motionControllerRight->MotionSource = "Right";
+
+	leftHand = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("leftHand"));
+	leftHand->SetupAttachment(motionControllerLeft);
+	leftHand->SetCollisionEnabled(ECollisionEnabled::NoCollision);	
+	leftHand->SetRelativeScale3D(FVector(0.1));
 
 	rightHand = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("rightHand"));
 	rightHand->SetupAttachment(motionControllerRight);
 	rightHand->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	rightHand->SetRelativeScale3D(FVector(0.1));
 
-	leftHand = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("leftHand"));
-	leftHand->SetupAttachment(motionControllerLeft);
-	leftHand->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
+	sword = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("sword"));
+	sword->SetupAttachment(motionControllerRight);
+	sword->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);;
+	sword->SetRelativeScale3D(FVector(0.5, 0.05, 0.05));
+	sword->SetRelativeLocation(FVector(30, 0, 0));
 
 	HMD = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HMD"));
 	HMD->SetupAttachment(cameraComponent);
 	HMD->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-// 	rightLog = CreateDefaultSubobject<UTextRenderComponent>(TEXT("RightLogText"));
-// 	rightLog->SetupAttachment(motionControllerRight);
-// 	rightLog->SetRelativeRotation(FRotator(135, 0, 180));
-// 	rightLog->SetRelativeLocation(FVector(0, 0, 10));
-// 	rightLog->SetTextRenderColor(FColor::Yellow);
-// 	rightLog->SetHorizontalAlignment(EHTA_Center);
-// 	rightLog->SetHorizontalAlignment(EHTA_Center);
-
-	leftLog = CreateDefaultSubobject<UTextRenderComponent>(TEXT("LeftLogText"));
-	leftLog->SetupAttachment(motionControllerLeft);
-	leftLog->SetRelativeRotation(FRotator(135, 0, 180));
-	leftLog->SetRelativeLocation(FVector(0, 0, 10));
-	leftLog->SetTextRenderColor(FColor::Yellow);
-	leftLog->SetHorizontalAlignment(EHTA_Center);
-
-
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempLeftMesh(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
+	if (tempLeftMesh.Succeeded())
+	{
+		leftHand->SetStaticMesh(tempLeftMesh.Object);
+	}	
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempRightMesh(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
 	if (tempRightMesh.Succeeded())
 	{
 		rightHand->SetStaticMesh(tempRightMesh.Object);
-	}
-	rightHand->SetRelativeScale3D(FVector(0.1));
+	}	
 
-	ConstructorHelpers::FObjectFinder<UStaticMesh> tempLeftMesh(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
-	if (tempLeftMesh.Succeeded())
+	ConstructorHelpers::FObjectFinder<UStaticMesh> tempswordMesh(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
+	if (tempswordMesh.Succeeded())
 	{
-		leftHand->SetStaticMesh(tempLeftMesh.Object);
+		sword->SetStaticMesh(tempswordMesh.Object);
 	}
-	leftHand->SetRelativeScale3D(FVector(0.1));
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempHMDMesh(TEXT("StaticMesh'/Engine/VREditor/Devices/Generic/GenericHMD.GenericHMD'"));
 	if (tempHMDMesh.Succeeded())
@@ -82,6 +79,11 @@ AVR_Player::AVR_Player()
 
 	bUseControllerRotationPitch = true;
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
+
+	// 액터 컴포넌트들 추가
+	moveComp = CreateDefaultSubobject<UMoveComponent>(TEXT("Move Component"));
+	equipComp = CreateDefaultSubobject<UEquipComponent>(TEXT("Equip Component"));
+
 }
 
 // Called when the game starts or when spawned
@@ -117,30 +119,12 @@ void AVR_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	UEnhancedInputComponent* enhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (enhancedInputComponent != nullptr)
 	{
-		enhancedInputComponent->BindAction(leftInputs[0], ETriggerEvent::Triggered, this, &AVR_Player::OnTriggerLeft);
-		enhancedInputComponent->BindAction(leftInputs[0], ETriggerEvent::Completed, this, &AVR_Player::OnTriggerLeft);
-		enhancedInputComponent->BindAction(leftInputs[1], ETriggerEvent::Triggered, this, &AVR_Player::RotateAxis);
+		moveComp->SetupPlayerInputComponent(enhancedInputComponent);
+		equipComp->SetupPlayerInputComponent(enhancedInputComponent);
 	}
 }
 
-void AVR_Player::OnTriggerLeft(const FInputActionValue& value)
-{
-	float val = value.Get<float>();
-
-	// 왼손 로그에 값을 출력한다.
-	FString msg = FString::Printf(TEXT("%f"), val);
-	leftLog->SetText(FText::FromString(msg));
-}
-
-void AVR_Player::RotateAxis(const FInputActionValue& value)
-{
-	
-	float val = value.Get<float>();
-	// axis 값을 이용해서 캐릭터(컨트롤러)를 회전한다.
-	//AddControllerPitchInput(axis.Y * -1.0f);
-	AddControllerYawInput(val);
 
 
-	//cam->SetRelativeRotation(FRotator(-axis.Y, 0, 0));
-	//SetActorRotation(GetActorRotation()+FRotator(0,axis.X,0));
-}
+
+
