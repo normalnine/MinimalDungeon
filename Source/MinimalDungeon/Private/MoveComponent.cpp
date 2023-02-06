@@ -8,6 +8,8 @@
 #include "CollisionDebugDrawingPublic.h"
 #include "Math/RotationMatrix.h"
 #include <Components/CapsuleComponent.h>
+#include "TeleportRingActor.h"
+#include "NiagaraComponent.h"
 
 // Sets default values for this component's properties
 UMoveComponent::UMoveComponent()
@@ -120,6 +122,19 @@ void UMoveComponent::DrawMoveLine()
 		DrawDebugLine(GetWorld(), lineLoc[i], lineLoc[i + 1], FColor::Green, false, -1, 0, 2);
 	}
 
+	// 텔레포트 링 이펙트를 마지막 라인 위치에 배치한다.
+	if (spawned_fx == nullptr)
+	{
+		// 이펙트를 생성한다.
+		spawned_fx = currentWorld->SpawnActor<ATeleportRingActor>(teleport_fx, lineLoc[lineLoc.Num() - 1], FRotator::ZeroRotator);
+	}
+	else
+	{
+		// 안보이게 처리된 이펙트를 다시 보이게 한다.
+		spawned_fx->niagara_fx->SetVisibility(true);
+		spawned_fx->SetActorLocation(lineLoc[lineLoc.Num() - 1]);
+	}
+
 }
 
 void UMoveComponent::Teleport()
@@ -128,6 +143,11 @@ void UMoveComponent::Teleport()
 	FVector targetLoc = lineLoc[lineLoc.Num() - 1];
 	targetLoc.Z += player->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	player->SetActorLocation(targetLoc, false, nullptr, ETeleportType::TeleportPhysics);
+
+	if (spawned_fx != nullptr)
+	{
+		spawned_fx->niagara_fx->SetVisibility(false);
+	}
 }
 
 void UMoveComponent::ShowLine()
