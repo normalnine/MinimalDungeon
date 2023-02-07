@@ -30,20 +30,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Inputs")
 	class UInputAction* buttonY;
 
-// 	UPROPERTY(EditAnywhere, Category = "Inputs")
-// 	class UInputAction* leftTrigger;
-// 
-// 	UPROPERTY(EditAnywhere, Category = "Inputs")
-// 	TSubclassOf<class AKnife> knifeFactory;
-
 private:
 	bool isEquippingSword = true;
-// 	bool isEquippingKnife = false;
 
 	class AVR_Player* player;
-// 	class AKnife* knife;
-
 	void EquipSword();
-	//void EquipKnife();
+	
 };
 

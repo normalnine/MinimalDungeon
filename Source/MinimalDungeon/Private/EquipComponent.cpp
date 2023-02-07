@@ -5,20 +5,13 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "VR_Player.h"
-#include "Knife.h"
 
 // Sets default values for this component's properties
 UEquipComponent::UEquipComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
-// 	ConstructorHelpers::FClassFinder<AKnife> tempKnife(TEXT("/Script/Engine.Blueprint'/Game/KDH/Blueprints/BP_Knife.BP_Knife_C'"));
-// 	if (tempKnife.Succeeded())
-// 	{
-// 		knife = Cast<AKnife>(tempKnife.Class);
-// 	}
+	PrimaryComponentTick.bCanEverTick = true;	
 }
 
 
@@ -42,8 +35,7 @@ void UEquipComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 void UEquipComponent::SetupPlayerInputComponent(class UEnhancedInputComponent* PlayerInputComponent)
 {
 	PlayerInputComponent->BindAction(buttonY, ETriggerEvent::Started, this, &UEquipComponent::EquipSword);
-	//PlayerInputComponent->BindAction(leftTrigger, ETriggerEvent::Triggered, this, &UEquipComponent::EquipKnife);
-	//PlayerInputComponent->BindAction(leftTrigger, ETriggerEvent::Completed, this, &UEquipComponent::EquipKnife);
+	
 }
 
 void UEquipComponent::EquipSword()
@@ -60,17 +52,4 @@ void UEquipComponent::EquipSword()
 	}
 }
 
-// void UEquipComponent::EquipKnife()
-// {
-// 	if (isEquippingKnife)
-// 	{
-// 		isEquippingKnife = false;		
-// 	}
-// 	else
-// 	{
-// 		isEquippingKnife = true;
-// 		GetWorld()->SpawnActor(knife, player->leftHand->GetComponentTransform());
-// 		knife->AttachToComponent(player->leftHand);
-// 	}
-// 	
-// }
+
