@@ -16,7 +16,7 @@ class MINIMALDUNGEON_API AKnife : public APickUpActor
 
 public:
 	AKnife();
-
+	
 protected:
 	virtual void BeginPlay() override;
 

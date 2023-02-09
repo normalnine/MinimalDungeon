@@ -269,7 +269,7 @@ bool UEnemy_1_FSM::IsTargetTrace()
 		FHitResult hitInfo;
 		FCollisionQueryParams param;
 		param.AddIgnoredActor(me);
-		bool bhit = GetWorld()->LineTraceSingleByChannel(hitInfo, me->GetActorLocation(), target->GetActorLocation(), ECollisionChannel::ECC_Visibility, param);
+		bool bhit = GetWorld()->LineTraceSingleByChannel(hitInfo, me->GetActorLocation(), target->GetActorLocation(), ECollisionChannel::ECC_EngineTraceChannel4, param);
 
 		if (bhit)
 		{
