@@ -1,0 +1,166 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Enemy_2_FSM.h"
+#include "VR_Player.h"
+#include "Enemy_2_Bullet.h"
+#include "Enemy_2.h"
+#include <Kismet/GameplayStatics.h>
+#include <Components/CapsuleComponent.h>
+
+
+// Sets default values for this component's properties
+UEnemy_2_FSM::UEnemy_2_FSM()
+{
+	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+	// off to improve performance if you don't need them.
+	PrimaryComponentTick.bCanEverTick = true;
+
+	// ...
+}
+
+
+// Called when the game starts
+void UEnemy_2_FSM::BeginPlay()
+{
+	Super::BeginPlay();
+
+	auto actor = UGameplayStatics::GetActorOfClass(GetWorld(),AVR_Player::StaticClass());
+
+	target = Cast<AVR_Player>(actor);
+
+	me = Cast<AEnemy_2>(GetOwner());
+	
+}
+
+
+// Called every frame
+void UEnemy_2_FSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	switch (mState)
+	{
+	case EEnemyState::Idle:
+		IdleState();
+		break;
+	case EEnemyState::Attack:
+		AttackState();
+		break;
+	case EEnemyState::AttackDelay:
+		UpdaetAttackDelay();
+		break;
+	case EEnemyState::Damage:
+		DamageState();
+		break;
+	case EEnemyState::Die:
+		DieState();
+		break;
+	}
+}
+//대기상태
+void UEnemy_2_FSM::IdleState()
+{
+	FVector des = target->GetActorLocation();
+
+	FVector dir = des-me->GetActorLocation();
+
+	if (dir.Size() <attackRange)
+	{
+		currentTime += GetWorld()->DeltaTimeSeconds;
+
+		if (currentTime > DelayTime)
+		{
+			mState = EEnemyState::Attack;
+			currentTime = 0;
+		}
+		
+	}
+}
+//공격상태
+void UEnemy_2_FSM::AttackState()
+{
+	FVector des = target->GetActorLocation();
+
+	FVector dir = des - me->GetActorLocation();
+
+	FRotator dirx = dir.Rotation();
+	//플레이어 방향으로
+	//me->GetMesh()->GetSocketRotation(TEXT("Socket")) = dirx;
+
+	//총알을  소켓 에서 스폰한다
+	GetWorld()->SpawnActor<AEnemy_2_Bullet>(bulletFactory,me->GetMesh()->GetSocketLocation(TEXT("Socket")),dirx);
+
+	//대기로 변경
+	mState = EEnemyState::AttackDelay;
+
+	
+}
+//공격 대기
+void UEnemy_2_FSM::UpdaetAttackDelay()
+{
+	//2초 대기
+	/*FTimerHandle Timer;
+	GetWorld()->GetTimerManager().SetTimer(Timer, this, &UEnemy_2_FSM::IdleState, 5.0f, true);*/
+	
+	
+		currentTime += GetWorld()->DeltaTimeSeconds;
+
+		if (currentTime > DelayTime)
+		{
+			mState = EEnemyState::Idle;
+			currentTime = 0;
+		}
+
+	
+	
+}
+//피격상태
+void UEnemy_2_FSM::DamageState()
+{
+	currentTime += GetWorld()->DeltaTimeSeconds;
+
+	if (currentTime > DelayTime)
+	{
+		mState = EEnemyState::Idle;
+		currentTime = 0;
+	}
+}
+//죽음상태
+void UEnemy_2_FSM::DieState()
+{
+	FVector p0 = me->GetActorLocation();
+	FVector vt = FVector::DownVector * dieSpeed * GetWorld()->DeltaTimeSeconds;
+	FVector p = p0 + vt;
+	//2. 만약에 p.Z 가 -200 보다 작으면 파괴한다
+	if (p.Z < -200)
+	{
+		me->Destroy();
+	}
+}
+void UEnemy_2_FSM::OnDamageProcess()
+{
+
+	//체력감소
+	hp--;
+	
+	//체력이 남아있다면
+	if (hp > 0)
+	{
+		//상태를 피격으로 전환
+		mState = EEnemyState::Damage;
+		//currentTime = 0;
+		
+		
+	}
+	//그렇지않다면
+	else {
+		//상태를 죽음으로 전환
+		mState = EEnemyState::Die;
+		//캡슐 충돌체 비활성화
+		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		
+
+	}
+	
+}

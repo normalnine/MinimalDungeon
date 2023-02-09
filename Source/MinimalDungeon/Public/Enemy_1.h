@@ -24,7 +24,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
+	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	// Ä® ½ºÅÂÆ½¸Å½¬
+	UPROPERTY(VisibleAnywhere)
+		class UStaticMeshComponent* SwordMeshComp;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
 	class UEnemy_1_FSM* fsm;
 };
