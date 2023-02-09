@@ -27,10 +27,10 @@ void AKnife::BeginPlay()
 
 void AKnife::KnifeAttack(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (player->graspComp->bIsGrab)
-	{
-		return;
-	}
-	GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("hit!!!!!!!!!!!")));
-	SetActorLocation(Hit.Location);
+// 	if (player->graspComp->bIsGrab)
+// 	{
+// 		return;
+// 	}
+// 	GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("hit!!!!!!!!!!!")));
+// 	SetActorLocation(Hit.Location);
 }
