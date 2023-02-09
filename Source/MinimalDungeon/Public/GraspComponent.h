@@ -37,7 +37,7 @@ public:
 		float grapDistance = 30.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inputs")
-		float throwPower = 1000.0f;
+		float throwPower = 1.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Inputs")
 		class UInputAction* leftTrigger;
@@ -48,15 +48,28 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Inputs")
 		float returnSpeed = 10.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Inputs")
+		float torquePower = 1500.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Inputs")
+	FVector throwDirection;
+
+	bool bIsGrab = false;
+
 
 private:
 	class AVR_Player* player;
-	bool bIsGrab = false;
+	
 	class APickUpActor* grabedObject;
 	bool bPhysicsState = false;
 	FVector prevLocation;
+	FVector prevForward;
 	bool isEquippingKnife = false;
 	class AKnife* knife;
+	double velocity = 0;
+	float currTime  = 0;
+	float createTime = 1.0f;
+	
 
 	void GripLeftAction(const struct FInputActionValue& value);
 	void GripLeftRelease(const struct FInputActionValue& value);
@@ -64,7 +77,7 @@ private:
 	void GripRightRelease(const struct FInputActionValue& value);
 
 	void GrapObject(UStaticMeshComponent* selectHand);
-	void ReleaseObject(UStaticMeshComponent* selectHand);
+	void ReleaseObject();
 	void DrawGrabRange();
 	void EquipKnife();
 

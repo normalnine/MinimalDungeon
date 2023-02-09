@@ -38,7 +38,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
 	class UStaticMeshComponent* leftHand;
 
-	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = "VR_Setting | Components")
 	class UStaticMeshComponent* sword;
 
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
@@ -66,8 +66,21 @@ public:
 	class UEquipComponent* equipComp;
 
 	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
-	class UGraspComponent* graspComp;
+	class UGraspComponent* graspComp;	
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	class UCapsuleComponent* swordCapsuleComp;
 
 private:
+	float currTime = 0;
+	float createTime = 1.0f;
+	FVector prevLocation;
+	FVector throwDirection;
+	float maxHp = 5;
+	float currHp;
 
+	UFUNCTION()
+	void SwordAttack(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	void ReceiveDamage();
 };

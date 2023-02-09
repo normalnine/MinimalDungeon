@@ -16,6 +16,9 @@
 #include "MoveComponent.h"
 #include "EquipComponent.h"
 #include "GraspComponent.h"
+#include <Components/CapsuleComponent.h>
+#include "PickUpActor.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 AVR_Player::AVR_Player()
@@ -44,11 +47,18 @@ AVR_Player::AVR_Player()
 	rightHand->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	rightHand->SetRelativeScale3D(FVector(0.1));
 
+	swordCapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Sword CapsuleComponent"));
+	swordCapsuleComp->SetupAttachment(motionControllerRight);
+	swordCapsuleComp->SetHiddenInGame(true);
+	swordCapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	swordCapsuleComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+	swordCapsuleComp->SetGenerateOverlapEvents(true);
+	
+
 	sword = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("sword"));
-	sword->SetupAttachment(motionControllerRight);
-	sword->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);;
+	sword->SetupAttachment(swordCapsuleComp);
+	sword->SetCollisionEnabled(ECollisionEnabled::NoCollision);;
 	sword->SetRelativeScale3D(FVector(0.5, 0.05, 0.05));
-	sword->SetRelativeLocation(FVector(30, 0, 0));
 
 	HMD = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HMD"));
 	HMD->SetupAttachment(cameraComponent);
@@ -104,12 +114,36 @@ void AVR_Player::BeginPlay()
 
 	// 3. 가져온 Subsystem 에 IMC 를 등록한다. (우선순위 0번)
 	subsys->AddMappingContext(myMapping, 0);	
+
+	swordCapsuleComp->OnComponentBeginOverlap.AddDynamic(this, &AVR_Player::SwordAttack);
+
+	currHp = maxHp;
 }
 
 // Called every frame
 void AVR_Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (sword->IsVisible())
+	{
+		currTime += DeltaTime;
+		if (currTime > createTime)
+		{
+			prevLocation = motionControllerRight->GetComponentLocation();
+			currTime = 0;
+		}
+		throwDirection = motionControllerRight->GetComponentLocation() - prevLocation;
+
+		if (throwDirection.Size() > 1)
+		{
+			swordCapsuleComp->SetHiddenInGame(false);
+		}
+		else
+		{
+			swordCapsuleComp->SetHiddenInGame(true);
+		}
+	}
+	
 
 }
 
@@ -127,6 +161,27 @@ void AVR_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	}
 }
 
+
+void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	APickUpActor* picKupActor = Cast<APickUpActor>(OtherActor);
+	if (picKupActor != nullptr)
+	{
+		GetWorld()->DestroyActor(picKupActor);
+	}
+}
+
+void AVR_Player::ReceiveDamage()
+{
+	currHp--;
+	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 0.5f, 0.5, FLinearColor::Red);
+
+	if (currHp == 0)
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), TEXT("TestMap"));
+	}
+
+}
 
 
 

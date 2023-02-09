@@ -16,4 +16,17 @@ class MINIMALDUNGEON_API AKnife : public APickUpActor
 
 public:
 	AKnife();
+
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	UPROPERTY()
+	class UGraspComponent* graspComp;
+
+	UPROPERTY()
+	class AVR_Player* player;
+private:
+	UFUNCTION()
+	void KnifeAttack(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };

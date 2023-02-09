@@ -44,6 +44,7 @@ void UEquipComponent::EquipSword()
 	{
 		isEquippingSword = false;
 		player->sword->SetVisibility(isEquippingSword);
+
 	}
 	else
 	{
