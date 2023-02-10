@@ -67,9 +67,9 @@ void AEnemy_2_Bullet::OnOverlapBegin(class UPrimitiveComponent* selfComp, class 
 	{
 		UE_LOG(LogTemp, Warning, TEXT("OverLap 1"));
 
-		FVector dirR = me->GetActorLocation() - target->GetActorLocation();
-		FRotator dirRR = dirR.Rotation();
-		SetActorRotation(dirRR);
+// 		FVector dirR = me->GetActorLocation() - target->GetActorLocation();
+// 		FRotator dirRR = dirR.Rotation();
+// 		SetActorRotation(dirRR);
 
 	}
 
