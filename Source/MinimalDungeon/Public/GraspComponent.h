@@ -55,12 +55,12 @@ public:
 	FVector throwDirection;
 
 	bool bIsGrab = false;
+	class APickUpActor* grabedObject;
 
 
 private:
 	class AVR_Player* player;
 	
-	class APickUpActor* grabedObject;
 	bool bPhysicsState = false;
 	FVector prevLocation;
 	FVector prevForward;

@@ -26,7 +26,10 @@ public:
 
 	UPROPERTY()
 	class AVR_Player* player;
+
+	UPROPERTY()
+	bool bKnifeStudded = false;
 private:
 	UFUNCTION()
-	void KnifeAttack(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

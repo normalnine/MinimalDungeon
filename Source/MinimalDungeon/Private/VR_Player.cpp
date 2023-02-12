@@ -17,8 +17,14 @@
 #include "EquipComponent.h"
 #include "GraspComponent.h"
 #include <Components/CapsuleComponent.h>
+#include <Components/TextRenderComponent.h>
 #include "PickUpActor.h"
 #include <Kismet/GameplayStatics.h>
+#include "Enemy_1.h"
+#include "Enemy_1_FSM.h"
+#include "Enemy_2.h"
+#include "Enemy_2_FSM.h"
+#include "Enemy_2_Bullet.h"
 
 // Sets default values
 AVR_Player::AVR_Player()
@@ -52,6 +58,7 @@ AVR_Player::AVR_Player()
 	swordCapsuleComp->SetHiddenInGame(true);
 	swordCapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	swordCapsuleComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+	swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	swordCapsuleComp->SetGenerateOverlapEvents(true);
 	
 
@@ -62,7 +69,13 @@ AVR_Player::AVR_Player()
 
 	HMD = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HMD"));
 	HMD->SetupAttachment(cameraComponent);
-	HMD->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HMD->SetCollisionEnabled(ECollisionEnabled::NoCollision);	
+
+	hp = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtHp"));
+	hp->SetupAttachment(leftHand);
+	hpNum = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtHpNum"));
+	hpNum->SetupAttachment(leftHand);
+
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempLeftMesh(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
 	if (tempLeftMesh.Succeeded())
@@ -87,7 +100,7 @@ AVR_Player::AVR_Player()
 	{
 		HMD->SetStaticMesh(tempHMDMesh.Object);
 	}
-
+	
 	bUseControllerRotationPitch = true;
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
@@ -95,6 +108,8 @@ AVR_Player::AVR_Player()
 	moveComp = CreateDefaultSubobject<UMoveComponent>(TEXT("Move Component"));
 	equipComp = CreateDefaultSubobject<UEquipComponent>(TEXT("Equip Component"));
 	graspComp = CreateDefaultSubobject<UGraspComponent>(TEXT("Grasp Component"));
+
+	currHp = maxHp;
 
 }
 
@@ -115,9 +130,9 @@ void AVR_Player::BeginPlay()
 	// 3. 가져온 Subsystem 에 IMC 를 등록한다. (우선순위 0번)
 	subsys->AddMappingContext(myMapping, 0);	
 
-	swordCapsuleComp->OnComponentBeginOverlap.AddDynamic(this, &AVR_Player::SwordAttack);
-
-	currHp = maxHp;
+	swordCapsuleComp->OnComponentBeginOverlap.AddDynamic(this, &AVR_Player::SwordAttack);	
+	FString hpStr = FString::FromInt((int32)currHp);
+	hpNum->SetText(FText::FromString(hpStr));
 }
 
 // Called every frame
@@ -136,14 +151,15 @@ void AVR_Player::Tick(float DeltaTime)
 
 		if (throwDirection.Size() > 1)
 		{
+			swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			swordCapsuleComp->SetHiddenInGame(false);
 		}
 		else
 		{
+			swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			swordCapsuleComp->SetHiddenInGame(true);
 		}
 	}
-	
 
 }
 
@@ -162,25 +178,41 @@ void AVR_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 }
 
 
-void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	APickUpActor* picKupActor = Cast<APickUpActor>(OtherActor);
-	if (picKupActor != nullptr)
+
+	AEnemy_1* enemy_1 =  Cast<AEnemy_1>(OtherActor);
+	if (enemy_1 != nullptr)
 	{
-		GetWorld()->DestroyActor(picKupActor);
+		enemy_1->fsm->OnDamageProcess();
+		SetActorLocation(SweepResult.Location);
+	}
+
+	AEnemy_2* enemy_2 = Cast<AEnemy_2>(OtherActor);
+	if (enemy_2 != nullptr)
+	{
+		enemy_2->fsm->OnDamageProcess();
+	}
+
+	AEnemy_2_Bullet* bullet_2 = Cast<AEnemy_2_Bullet>(OtherActor);
+	if (bullet_2 != nullptr)
+	{
+		
 	}
 }
 
 void AVR_Player::ReceiveDamage()
 {
 	currHp--;
-	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 0.5f, 0.5, FLinearColor::Red);
+	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 0.3f, 0.3, FLinearColor::Red);	
+
+	FString hpStr = FString::FromInt((int32)currHp);
+	hpNum->SetText(FText::FromString(hpStr));
 
 	if (currHp == 0)
-	{
+	{		
 		UGameplayStatics::OpenLevel(GetWorld(), TEXT("TestMap"));
 	}
-
 }
 
 

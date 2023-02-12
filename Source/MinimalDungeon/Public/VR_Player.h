@@ -71,16 +71,27 @@ public:
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
 	class UCapsuleComponent* swordCapsuleComp;
 
-private:
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	class UTextRenderComponent* hp;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	class UTextRenderComponent* hpNum;
+
+	UFUNCTION(BlueprintCallable)
+	void ReceiveDamage();
+
 	float currTime = 0;
 	float createTime = 1.0f;
 	FVector prevLocation;
 	FVector throwDirection;
-	float maxHp = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float maxHp = 10;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float currHp;
 
 	UFUNCTION()
-	void SwordAttack(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	void ReceiveDamage();
+	
 };

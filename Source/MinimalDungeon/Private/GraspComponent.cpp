@@ -114,6 +114,7 @@ void UGraspComponent::GrapObject(UStaticMeshComponent* selectHand)
 			if (grabedObject == knife && isEquippingKnife == true)
 			{
 				knife->sphereComp->SetSimulatePhysics(true);
+				knife->bKnifeStudded = false;
 			}
 			// 만일, 검색된 물체의 physics 가 simulate 중이라면...
 			bPhysicsState = grabedObject->sphereComp->IsSimulatingPhysics();
@@ -203,7 +204,7 @@ void UGraspComponent::EquipKnife()
 			dir.GetSafeNormal();
 			FVector p = knife->GetActorLocation() + dir * returnSpeed* GetWorld()->DeltaTimeSeconds;
 			knife->SetActorLocation(p);
-	
+			
 		
 		}
 		else
@@ -212,6 +213,7 @@ void UGraspComponent::EquipKnife()
 			{
 				isEquippingKnife = true;
 				knife = GetWorld()->SpawnActor<AKnife>(knifeFactory, player->leftHand->GetComponentTransform());
+				
 			}
 		
 		}
