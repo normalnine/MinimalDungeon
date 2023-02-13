@@ -6,6 +6,7 @@
 #include <GameFramework/ProjectileMovementComponent.h>
 #include "VR_Player.h"
 #include "Enemy_2.h"
+#include <Kismet/GameplayStatics.h>
 
 
 // Sets default values
@@ -41,7 +42,8 @@ void AEnemy_2_Bullet::BeginPlay()
 	FTimerHandle ddd;
 	GetWorld()->GetTimerManager().SetTimer(ddd,this,&AEnemy_2_Bullet::Die,3.0f,false);
 
-	me =Cast<AEnemy_2>(GetOwner());
+	auto actor = UGameplayStatics::GetActorOfClass(GetWorld(), AEnemy_2::StaticClass());
+	me = Cast<AEnemy_2>(actor);
 }
 
 // Called every frame
@@ -75,7 +77,22 @@ void AEnemy_2_Bullet::OnOverlapBegin(class UPrimitiveComponent* selfComp, class 
 }
 void AEnemy_2_Bullet::returnBack()
 {
-	FVector dirR = me->GetActorLocation() - GetActorLocation();
-	FRotator dirRR = dirR.Rotation();
-	SetActorRotation(dirRR);
+	
+	// Get the sword's velocity vector
+	FVector SwordVelocity = GetVelocity();
+
+	// Reflect the bullet's velocity vector along the sword's velocity vector
+	FVector ReflectedVelocity = FMath::GetReflectionVector(GetVelocity(), SwordVelocity);
+
+	// Set the bullet's new velocity
+	SetActorRotation(ReflectedVelocity.Rotation());
+	SetActorLocation(GetActorLocation() + ReflectedVelocity*1000 * GetWorld()->GetDeltaSeconds(), false);
+
+	SetActorRotation(me->GetActorRotation());
+
+// 	FVector dirR = me->GetActorLocation()-GetActorLocation();
+// 	dirR.Normalize();
+// 	FVector p = GetActorLocation() + dirR*50*GetWorld()->DeltaTimeSeconds;
+// 	//FRotator dirRR = dirR.Rotation();
+// 	SetActorLocation(p);
 }

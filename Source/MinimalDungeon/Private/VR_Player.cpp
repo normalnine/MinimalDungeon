@@ -27,6 +27,10 @@
 #include "Enemy_2_Bullet.h"
 #include "PickUpFood.h"
 #include <Components/SphereComponent.h>
+#include "Enemy_3.h"
+#include "Enemy_3_FSM.h"
+#include "Enemy_4.h"
+#include "Enemy_4_FSM.h"
 
 // Sets default values
 AVR_Player::AVR_Player()
@@ -174,7 +178,7 @@ void AVR_Player::Tick(float DeltaTime)
 		}
 		throwDirection = motionControllerRight->GetComponentLocation() - prevLocation;
 
-		if (throwDirection.Size() > 5)
+		if (throwDirection.Size() > 2)
 		{
 			swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			swordCapsuleComp->SetHiddenInGame(false);
@@ -219,10 +223,24 @@ void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* O
 		enemy_2->fsm->OnDamageProcess();
 	}
 
+	AEnemy_3* enemy_3 = Cast<AEnemy_3>(OtherActor);
+	if (enemy_3 != nullptr)
+	{
+		enemy_3->fsm->OnDamageProcess();
+	}
+
+	AEnemy_4* enemy_4 = Cast<AEnemy_4>(OtherActor);
+	if (enemy_4 != nullptr)
+	{
+		enemy_4->fsm->OnDamageProcess();
+	}
+
 	AEnemy_2_Bullet* bullet_2 = Cast<AEnemy_2_Bullet>(OtherActor);
 	if (bullet_2 != nullptr)
 	{
-		
+		//bullet_2->returnBack();
+		GetWorld()->DestroyActor(OtherActor);
+	
 	}
 }
 
