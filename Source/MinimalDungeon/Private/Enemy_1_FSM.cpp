@@ -12,6 +12,8 @@
 #include <AIController.h>
 #include <NavigationSystem.h>
 #include <Kismet/KismetMathLibrary.h>
+#include <Engine/EngineTypes.h>
+#include "GameFramework/Actor.h"
 
 // Sets default values for this component's properties
 UEnemy_1_FSM::UEnemy_1_FSM()
@@ -44,6 +46,10 @@ void UEnemy_1_FSM::BeginPlay()
 	ai = Cast<AAIController>(me->GetController());
 
 	originPos = me->GetActorLocation();
+
+	mat = UMaterialInstanceDynamic::Create(me->GetMesh()->GetMaterial(0), this);
+
+	me->GetMesh()->SetMaterial(0,mat);
 }
 
 
@@ -218,11 +224,19 @@ void UEnemy_1_FSM::OnDamageProcess()
 		mState = EEnemyState::Damage;
 		currentTime = 0;
 		//피격 애니메이션 재생
-		
 		FString sectionName = FString::Printf(TEXT("Damage0"));
 		anim->PlayDamageAnim(FName(*sectionName));
+		//색을 빨간색으로 변경
+		
+		mat->SetVectorParameterValue(TEXT("EmissiveColor"),FVector4(1,0,0,1));
+		mat->SetScalarParameterValue(TEXT("Glow"),50.0f);
+	
+		GetWorld()->GetTimerManager().ClearTimer(colorHandle);
+		GetWorld()->GetTimerManager().SetTimer(colorHandle, this, &UEnemy_1_FSM::ColorOff, 0.5f, false);
 		
 	}
+		
+	
 	else 
 	{
 		//상태를 죽음으로 전환
@@ -357,10 +371,13 @@ void UEnemy_1_FSM::ChangeState(EEnemyState state)
 
 		//충돌안되게 설정
 		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		//Die 몽타주 실행
-		me->PlayAnimMontage(damageMontage, 1.0f, FName(TEXT("Die")));
+
 		FTransform dropPos = me->GetTransform();
 		GetWorld()->SpawnActor<ACoin>(DropFactory, dropPos);
+
+		//Die 몽타주 실행
+		me->PlayAnimMontage(damageMontage, 1.0f, FName(TEXT("Die")));
+		
 		break;
 	}
 }
@@ -392,4 +409,10 @@ void UEnemy_1_FSM::MoveToPos(FVector pos)
 		//Idle 상태로 전환
 		ChangeState(EEnemyState::Idle);
 	}
+}
+void UEnemy_1_FSM::ColorOff()
+{
+	
+	mat->SetVectorParameterValue(TEXT("EmissiveColor"), FVector4(1, 1, 1, 1));
+	mat->SetScalarParameterValue(TEXT("Glow"), 0);
 }

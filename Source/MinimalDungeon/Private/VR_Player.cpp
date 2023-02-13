@@ -19,6 +19,12 @@
 #include <Components/CapsuleComponent.h>
 #include "PickUpActor.h"
 #include <Kismet/GameplayStatics.h>
+#include "Enemy_1.h"
+#include "Enemy_1_FSM.h"
+#include "Enemy_4.h"
+#include "Enemy_4_FSM.h"
+
+
 
 // Sets default values
 AVR_Player::AVR_Player()
@@ -164,11 +170,22 @@ void AVR_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	APickUpActor* picKupActor = Cast<APickUpActor>(OtherActor);
-	if (picKupActor != nullptr)
+	//APickUpActor* picKupActor = Cast<APickUpActor>(OtherActor);
+	/*if (picKupActor != nullptr)
 	{
 		GetWorld()->DestroyActor(picKupActor);
+	}*/
+	AEnemy_1* E1 = Cast<AEnemy_1>(OtherActor);
+	if (E1 != nullptr)
+	{
+		E1->fsm->OnDamageProcess();
 	}
+	AEnemy_4* E2 = Cast<AEnemy_4>(OtherActor);
+	if (E2 != nullptr)
+	{
+		E2->fsm->OnDamageProcess();
+	}
+
 }
 
 void AVR_Player::ReceiveDamage()

@@ -3,27 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "EnemyF.h"
 #include "Enemy_3.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class MINIMALDUNGEON_API AEnemy_3 : public ACharacter
+class MINIMALDUNGEON_API AEnemy_3 : public AEnemyF
 {
 	GENERATED_BODY()
-
 public:
 	// Sets default values for this character's properties
 	AEnemy_3();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
+		class UEnemy_3_FSM* fsm;
 };

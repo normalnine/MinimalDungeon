@@ -2,33 +2,28 @@
 
 
 #include "Enemy_3.h"
+#include "Enemy_3_FSM.h"
 
-// Sets default values
 AEnemy_3::AEnemy_3()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 
-}
 
-// Called when the game starts or when spawned
-void AEnemy_3::BeginPlay()
-{
-	Super::BeginPlay();
+	ConstructorHelpers::FObjectFinder<USkeletalMesh>tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/LJW/Enemys/slime_TurtleShell/RPG_Monster_Duo_PBR_Polyart/Meshes/SlimeMesh.SlimeMesh'"));
 	
+	if (tempMesh.Succeeded())
+	{
+	
+	GetMesh()->SetSkeletalMesh(tempMesh.Object);
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
+	}
+
+
+	fsm = CreateDefaultSubobject<UEnemy_3_FSM>(TEXT("FSM"));
+
+	//애니메이션 블루프린트 할당하기
+	ConstructorHelpers::FClassFinder<UAnimInstance>tempClass(TEXT("/Script/Engine.AnimBlueprint'/Game/LJW/Enemys/slime_TurtleShell/RPG_Monster_Duo_PBR_Polyart/Animations/Slime/ABP_Enemy_3.ABP_Enemy_3_C'"));
+	if (tempClass.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(tempClass.Class);
+	}
 }
-
-// Called every frame
-void AEnemy_3::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-// Called to bind functionality to input
-void AEnemy_3::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
