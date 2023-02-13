@@ -6,8 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "Enemy_2_FSM.generated.h"
 
-
-enum class EEnemyState : uint8
+UENUM(BlueprintType)
+enum class EEnemy2State : uint8
 {
 	Idle,
 	Attack,
@@ -33,7 +33,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSM)
-		EEnemyState mState = EEnemyState::Idle;
+		EEnemy2State mState = EEnemy2State::Idle;
 
 	//대기상태
 	void IdleState();
@@ -73,4 +73,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = FSM)
 		float dieSpeed = 50.0f;
+
+	//색바꾸려는 변수
+	class UMaterialInstanceDynamic* mat2;
+
+	//원래색으로 돌아가는 함수
+	void ColorOff();
+	//색깔 나오는 시간 핸들
+	FTimerHandle colorHandle;
 };

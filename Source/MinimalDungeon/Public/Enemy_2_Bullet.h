@@ -40,4 +40,6 @@ public:
 
 	UPROPERTY()
 	class AEnemy_2* me;
+
+	void returnBack();
 };

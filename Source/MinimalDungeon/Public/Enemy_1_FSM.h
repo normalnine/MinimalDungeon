@@ -132,4 +132,12 @@ public:
 	//드랍시킬아이템
 	UPROPERTY(EditDefaultsOnly, Category = DropFactory)
 		TSubclassOf<class ACoin> DropFactory;
+
+	//색바꾸려는 변수
+	class UMaterialInstanceDynamic* mat;
+
+	//원래색으로 돌아가는 함수
+	void ColorOff();
+	//색깔 나오는 시간 핸들
+	FTimerHandle colorHandle;
 };

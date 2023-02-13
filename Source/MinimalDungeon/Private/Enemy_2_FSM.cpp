@@ -41,19 +41,19 @@ void UEnemy_2_FSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 
 	switch (mState)
 	{
-	case EEnemyState::Idle:
+	case EEnemy2State::Idle:
 		IdleState();
 		break;
-	case EEnemyState::Attack:
+	case EEnemy2State::Attack:
 		AttackState();
 		break;
-	case EEnemyState::AttackDelay:
+	case EEnemy2State::AttackDelay:
 		UpdaetAttackDelay();
 		break;
-	case EEnemyState::Damage:
+	case EEnemy2State::Damage:
 		DamageState();
 		break;
-	case EEnemyState::Die:
+	case EEnemy2State::Die:
 		DieState();
 		break;
 	}
@@ -71,7 +71,7 @@ void UEnemy_2_FSM::IdleState()
 
 		if (currentTime > DelayTime)
 		{
-			mState = EEnemyState::Attack;
+			mState = EEnemy2State::Attack;
 			currentTime = 0;
 		}
 		
@@ -92,7 +92,7 @@ void UEnemy_2_FSM::AttackState()
 	GetWorld()->SpawnActor<AEnemy_2_Bullet>(bulletFactory,me->GetMesh()->GetSocketLocation(TEXT("Socket")),dirx);
 
 	//대기로 변경
-	mState = EEnemyState::AttackDelay;
+	mState = EEnemy2State::AttackDelay;
 
 	
 }
@@ -108,7 +108,7 @@ void UEnemy_2_FSM::UpdaetAttackDelay()
 
 		if (currentTime > DelayTime)
 		{
-			mState = EEnemyState::Idle;
+			mState = EEnemy2State::Idle;
 			currentTime = 0;
 		}
 
@@ -122,7 +122,7 @@ void UEnemy_2_FSM::DamageState()
 
 	if (currentTime > DelayTime)
 	{
-		mState = EEnemyState::Idle;
+		mState = EEnemy2State::Idle;
 		currentTime = 0;
 	}
 }
@@ -132,6 +132,7 @@ void UEnemy_2_FSM::DieState()
 	FVector p0 = me->GetActorLocation();
 	FVector vt = FVector::DownVector * dieSpeed * GetWorld()->DeltaTimeSeconds;
 	FVector p = p0 + vt;
+	me->SetActorLocation(p);
 	//2. 만약에 p.Z 가 -200 보다 작으면 파괴한다
 	if (p.Z < -200)
 	{
@@ -148,19 +149,29 @@ void UEnemy_2_FSM::OnDamageProcess()
 	if (hp > 0)
 	{
 		//상태를 피격으로 전환
-		mState = EEnemyState::Damage;
+		mState = EEnemy2State::Damage;
 		//currentTime = 0;
-		
+		//mat2->SetVectorParameterValue(TEXT("EmissiveColor"), FVector4(1, 0, 0, 1));
+		//mat2->SetScalarParameterValue(TEXT("Glow"), 50.0f);
+
+		//GetWorld()->GetTimerManager().ClearTimer(colorHandle);
+		//GetWorld()->GetTimerManager().SetTimer(colorHandle, this, &UEnemy_2_FSM::ColorOff, 0.5f, false);
 		
 	}
 	//그렇지않다면
 	else {
 		//상태를 죽음으로 전환
-		mState = EEnemyState::Die;
+		mState = EEnemy2State::Die;
 		//캡슐 충돌체 비활성화
 		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		
 
 	}
 	
+}
+void UEnemy_2_FSM::ColorOff()
+{
+
+	mat2->SetVectorParameterValue(TEXT("EmissiveColor"), FVector4(1, 1, 1, 1));
+	mat2->SetScalarParameterValue(TEXT("Glow"), 0);
 }
