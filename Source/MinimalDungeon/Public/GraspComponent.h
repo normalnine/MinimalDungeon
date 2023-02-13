@@ -37,7 +37,7 @@ public:
 		float grapDistance = 30.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inputs")
-		float throwPower = 1.0f;
+		float throwPower = 10000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Inputs")
 		class UInputAction* leftTrigger;

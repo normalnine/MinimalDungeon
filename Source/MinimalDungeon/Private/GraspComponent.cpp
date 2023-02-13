@@ -103,8 +103,9 @@ void UGraspComponent::GrapObject(UStaticMeshComponent* selectHand)
 	FString profileName = FString(TEXT("PickUp"));
 	FCollisionQueryParams params;
 	params.AddIgnoredActor(player);
-
-	if (GetWorld()->SweepSingleByProfile(hitInfo, Center, Center, FQuat::Identity, FName(*profileName), FCollisionShape::MakeSphere(grapDistance), params) && grabedObject == nullptr)
+	//GetWorld()->SweepSingleByProfile(hitInfo, Center, Center, FQuat::Identity, FName(*profileName), FCollisionShape::MakeSphere(grapDistance), params)
+	
+	if (GetWorld()->SweepSingleByChannel(hitInfo, Center, Center, FQuat::Identity, ECC_EngineTraceChannel5, FCollisionShape::MakeSphere(grapDistance), params) && grabedObject == nullptr)
 	{
 		//player->rightLog->SetText(FText::FromString(hitInfo.GetActor()->GetName()));
 		grabedObject = Cast<APickUpActor>(hitInfo.GetActor());
@@ -186,6 +187,10 @@ void UGraspComponent::ReleaseObject()
 		// grabedObject 포인터 변수를 nullptr 로 변경한다
 		grabedObject = nullptr;
 	}
+// 	else if (grabedObject == nullptr && knife != nullptr)
+// 	{
+// 		knife->sphereComp->SetSimulatePhysics(true);
+// 	}
 }
 
 void UGraspComponent::DrawGrabRange()

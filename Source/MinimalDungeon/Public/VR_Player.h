@@ -45,6 +45,9 @@ public:
 	class UCameraComponent* cameraComponent;
 
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	class USphereComponent* sphereCompHMD;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
 	class UStaticMeshComponent* HMD;
 
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | MoudulSetting")
@@ -72,10 +75,24 @@ public:
 	class UCapsuleComponent* swordCapsuleComp;
 
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
-	class UTextRenderComponent* hp;
+	class UTextRenderComponent* textCompHp;
 
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
-	class UTextRenderComponent* hpNum;
+	class UTextRenderComponent* textCompHpNum;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+		class UTextRenderComponent* textCompCoin;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+		class UTextRenderComponent* textCompCoinNum;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+		class UTextRenderComponent* textCompKey;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+		class UTextRenderComponent* textCompKeyNum;
+
+	
 
 	UFUNCTION(BlueprintCallable)
 	void ReceiveDamage();
@@ -89,9 +106,16 @@ public:
 	float maxHp = 10;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float currHp;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float currCoin = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float currKey = 0;
 
 	UFUNCTION()
 	void SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	
+	UFUNCTION()
+	void EatFood(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResul);
+
+
 };

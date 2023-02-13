@@ -25,6 +25,8 @@
 #include "Enemy_2.h"
 #include "Enemy_2_FSM.h"
 #include "Enemy_2_Bullet.h"
+#include "PickUpFood.h"
+#include <Components/SphereComponent.h>
 
 // Sets default values
 AVR_Player::AVR_Player()
@@ -67,14 +69,28 @@ AVR_Player::AVR_Player()
 	sword->SetCollisionEnabled(ECollisionEnabled::NoCollision);;
 	sword->SetRelativeScale3D(FVector(0.5, 0.05, 0.05));
 
-	HMD = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HMD"));
-	HMD->SetupAttachment(cameraComponent);
-	HMD->SetCollisionEnabled(ECollisionEnabled::NoCollision);	
+	sphereCompHMD = CreateDefaultSubobject<USphereComponent>(TEXT("HMD SphereComponent"));
+	sphereCompHMD->SetupAttachment(cameraComponent);
+	
 
-	hp = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtHp"));
-	hp->SetupAttachment(leftHand);
-	hpNum = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtHpNum"));
-	hpNum->SetupAttachment(leftHand);
+	HMD = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HMD"));
+	HMD->SetupAttachment(sphereCompHMD);
+	HMD->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	textCompHp = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtHp"));
+	textCompHp->SetupAttachment(leftHand);
+	textCompHpNum = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtHpNum"));
+	textCompHpNum->SetupAttachment(leftHand);
+
+	textCompCoin = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtCoin"));
+	textCompCoin->SetupAttachment(leftHand);
+	textCompCoinNum = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtCoinNum"));
+	textCompCoinNum->SetupAttachment(leftHand);
+
+	textCompKey = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtkey"));
+	textCompKey->SetupAttachment(leftHand);
+	textCompKeyNum = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtkeyNum"));
+	textCompKeyNum->SetupAttachment(leftHand);
 
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempLeftMesh(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
@@ -130,9 +146,18 @@ void AVR_Player::BeginPlay()
 	// 3. 가져온 Subsystem 에 IMC 를 등록한다. (우선순위 0번)
 	subsys->AddMappingContext(myMapping, 0);	
 
+	sphereCompHMD->OnComponentBeginOverlap.AddDynamic(this, &AVR_Player::EatFood);
 	swordCapsuleComp->OnComponentBeginOverlap.AddDynamic(this, &AVR_Player::SwordAttack);	
+	
+
 	FString hpStr = FString::FromInt((int32)currHp);
-	hpNum->SetText(FText::FromString(hpStr));
+	textCompHpNum->SetText(FText::FromString(hpStr));
+
+	FString coinStr = FString::FromInt((int32)currCoin);
+	textCompCoinNum->SetText(FText::FromString(coinStr));
+
+	FString keyStr = FString::FromInt((int32)currKey);
+	textCompKeyNum->SetText(FText::FromString(keyStr));
 }
 
 // Called every frame
@@ -149,7 +174,7 @@ void AVR_Player::Tick(float DeltaTime)
 		}
 		throwDirection = motionControllerRight->GetComponentLocation() - prevLocation;
 
-		if (throwDirection.Size() > 1)
+		if (throwDirection.Size() > 5)
 		{
 			swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			swordCapsuleComp->SetHiddenInGame(false);
@@ -207,13 +232,27 @@ void AVR_Player::ReceiveDamage()
 	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 0.3f, 0.3, FLinearColor::Red);	
 
 	FString hpStr = FString::FromInt((int32)currHp);
-	hpNum->SetText(FText::FromString(hpStr));
+	textCompHpNum->SetText(FText::FromString(hpStr));
 
 	if (currHp == 0)
 	{		
 		UGameplayStatics::OpenLevel(GetWorld(), TEXT("TestMap"));
 	}
 }
+
+void AVR_Player::EatFood(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResul)
+{
+	APickUpFood* food = Cast<APickUpFood>(OtherActor);
+	if (food != nullptr)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("foodeat!!"));
+		GetWorld()->DestroyActor(OtherActor);
+		currHp++;
+		FString hpStr = FString::FromInt((int32)currHp);
+		textCompHpNum->SetText(FText::FromString(hpStr));
+	}
+}
+
 
 
 
