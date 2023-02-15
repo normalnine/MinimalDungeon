@@ -8,18 +8,15 @@
 #include "GraspComponent.h"
 #include "Enemy_1.h"
 #include "Enemy_2.h"
+#include "Enemy_3.h"
+#include "Enemy_4.h"
 #include "Enemy_1_FSM.h"
 #include "Enemy_2_FSM.h"
+#include "Enemy_3_FSM.h"
+#include "Enemy_4_FSM.h"
 
 AKnife::AKnife()
 {
-	sphereComp->SetSphereRadius(10);
-	meshComp->SetRelativeScale3D(FVector(0.03));
-	ConstructorHelpers::FObjectFinder<UStaticMesh> tempKnifeMesh(TEXT("/Script/Engine.StaticMesh'/Engine/VREditor/BasicMeshes/SM_Cube_03.SM_Cube_03'"));
-	if (tempKnifeMesh.Succeeded())
-	{
-		meshComp->SetStaticMesh(tempKnifeMesh.Object);
-	}
 }
 
 void AKnife::BeginPlay()
@@ -33,13 +30,13 @@ void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* Other
 {
 	AEnemy_1* enemy_1 = Cast<AEnemy_1>(OtherActor);
 	if (enemy_1 != nullptr)
-	{
+	{	
+		// 박혀 있는 동안 충돌 안되게 하기 위해 체크
 		if (bKnifeStudded == false)
 		{
 			enemy_1->fsm->OnDamageProcess();
 			sphereComp->SetSimulatePhysics(false);
 			SetActorLocation(enemy_1->GetActorLocation());
-			//SetActorLocation(SweepResult.Location);
 			bKnifeStudded = true;
 		}		
 	}
@@ -52,11 +49,31 @@ void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* Other
 			enemy_2->fsm->OnDamageProcess();
 			sphereComp->SetSimulatePhysics(false);
 			SetActorLocation(enemy_2->GetActorLocation());
-			//SetActorLocation(SweepResult.Location);
+			bKnifeStudded = true;
+		}
+	} 	
+
+	AEnemy_3* enemy_3 = Cast<AEnemy_3>(OtherActor);
+	if (enemy_2 != nullptr)
+	{
+		if (bKnifeStudded == false)
+		{
+			enemy_3->fsm->OnDamageProcess();
+			sphereComp->SetSimulatePhysics(false);
+			SetActorLocation(enemy_3->GetActorLocation());
 			bKnifeStudded = true;
 		}
 	}
 
-	//GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("hit!!!!!!!!!!!")));
- 	
+	AEnemy_4* enemy_4 = Cast<AEnemy_4>(OtherActor);
+	if (enemy_4 != nullptr)
+	{
+		if (bKnifeStudded == false)
+		{
+			enemy_4->fsm->OnDamageProcess();
+			sphereComp->SetSimulatePhysics(false);
+			SetActorLocation(enemy_2->GetActorLocation());
+			bKnifeStudded = true;
+		}
+	}
 }

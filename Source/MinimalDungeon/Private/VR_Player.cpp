@@ -63,19 +63,15 @@ AVR_Player::AVR_Player()
 	swordCapsuleComp->SetupAttachment(motionControllerRight);
 	swordCapsuleComp->SetHiddenInGame(true);
 	swordCapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-	swordCapsuleComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 	swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	swordCapsuleComp->SetGenerateOverlapEvents(true);
-	
+	swordCapsuleComp->SetGenerateOverlapEvents(true);	
 
 	sword = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("sword"));
 	sword->SetupAttachment(swordCapsuleComp);
-	sword->SetCollisionEnabled(ECollisionEnabled::NoCollision);;
-	sword->SetRelativeScale3D(FVector(0.5, 0.05, 0.05));
+	sword->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	sphereCompHMD = CreateDefaultSubobject<USphereComponent>(TEXT("HMD SphereComponent"));
-	sphereCompHMD->SetupAttachment(cameraComponent);
-	
+	sphereCompHMD->SetupAttachment(cameraComponent);	
 
 	HMD = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HMD"));
 	HMD->SetupAttachment(sphereCompHMD);
@@ -108,12 +104,6 @@ AVR_Player::AVR_Player()
 	{
 		rightHand->SetStaticMesh(tempRightMesh.Object);
 	}	
-
-	ConstructorHelpers::FObjectFinder<UStaticMesh> tempswordMesh(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
-	if (tempswordMesh.Succeeded())
-	{
-		sword->SetStaticMesh(tempswordMesh.Object);
-	}
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempHMDMesh(TEXT("StaticMesh'/Engine/VREditor/Devices/Generic/GenericHMD.GenericHMD'"));
 	if (tempHMDMesh.Succeeded())
@@ -214,7 +204,9 @@ void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* O
 	if (enemy_1 != nullptr)
 	{
 		enemy_1->fsm->OnDamageProcess();
-		SetActorLocation(SweepResult.Location);
+		//SetActorLocation(SweepResult.Location);
+		enemy_1->GetCapsuleComponent()->AddImpulse(FVector(-50)*enemy_1->GetActorForwardVector());
+
 	}
 
 	AEnemy_2* enemy_2 = Cast<AEnemy_2>(OtherActor);
