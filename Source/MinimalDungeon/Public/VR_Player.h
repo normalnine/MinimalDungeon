@@ -92,15 +92,27 @@ public:
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
 		class UTextRenderComponent* textCompKeyNum;
 
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	TSubclassOf<class AStatsUIActor> statsUIActorFactory;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	class AStatsUIActor* statsUIActor;
+
 	
 
 	UFUNCTION(BlueprintCallable)
 	void ReceiveDamage();
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float currTime = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float createTime = 1.0f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector prevLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector throwDirection;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bShowStatsUI = false;
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float maxHp = 10;
@@ -117,5 +129,6 @@ public:
 	UFUNCTION()
 	void EatFood(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResul);
 
-
+	UFUNCTION()
+	void OpenStatsUI();
 };

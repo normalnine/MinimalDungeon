@@ -31,6 +31,7 @@
 #include "Enemy_3_FSM.h"
 #include "Enemy_4.h"
 #include "Enemy_4_FSM.h"
+#include "StatsUIActor.h"
 
 // Sets default values
 AVR_Player::AVR_Player()
@@ -63,19 +64,15 @@ AVR_Player::AVR_Player()
 	swordCapsuleComp->SetupAttachment(motionControllerRight);
 	swordCapsuleComp->SetHiddenInGame(true);
 	swordCapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-	swordCapsuleComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 	swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	swordCapsuleComp->SetGenerateOverlapEvents(true);
-	
+	swordCapsuleComp->SetGenerateOverlapEvents(true);	
 
 	sword = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("sword"));
 	sword->SetupAttachment(swordCapsuleComp);
-	sword->SetCollisionEnabled(ECollisionEnabled::NoCollision);;
-	sword->SetRelativeScale3D(FVector(0.5, 0.05, 0.05));
+	sword->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	sphereCompHMD = CreateDefaultSubobject<USphereComponent>(TEXT("HMD SphereComponent"));
-	sphereCompHMD->SetupAttachment(cameraComponent);
-	
+	sphereCompHMD->SetupAttachment(cameraComponent);	
 
 	HMD = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HMD"));
 	HMD->SetupAttachment(sphereCompHMD);
@@ -109,16 +106,16 @@ AVR_Player::AVR_Player()
 		rightHand->SetStaticMesh(tempRightMesh.Object);
 	}	
 
-	ConstructorHelpers::FObjectFinder<UStaticMesh> tempswordMesh(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
-	if (tempswordMesh.Succeeded())
-	{
-		sword->SetStaticMesh(tempswordMesh.Object);
-	}
-
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempHMDMesh(TEXT("StaticMesh'/Engine/VREditor/Devices/Generic/GenericHMD.GenericHMD'"));
 	if (tempHMDMesh.Succeeded())
 	{
 		HMD->SetStaticMesh(tempHMDMesh.Object);
+	}
+
+	ConstructorHelpers::FClassFinder<AStatsUIActor> tempStatsUIActor(TEXT("/Script/Engine.Blueprint'/Game/KDH/Blueprints/BP_StatsUIActor.BP_StatsUIActor_C'"));
+	if (tempStatsUIActor.Succeeded())
+	{
+		statsUIActorFactory = tempStatsUIActor.Class;
 	}
 	
 	bUseControllerRotationPitch = true;
@@ -200,6 +197,7 @@ void AVR_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	UEnhancedInputComponent* enhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (enhancedInputComponent != nullptr)
 	{
+		enhancedInputComponent->BindAction(leftInputs[0], ETriggerEvent::Started, this, &AVR_Player::OpenStatsUI);
 		moveComp->SetupPlayerInputComponent(enhancedInputComponent);
 		equipComp->SetupPlayerInputComponent(enhancedInputComponent);
 		graspComp->SetupPlayerInputComponent(enhancedInputComponent);
@@ -214,7 +212,9 @@ void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* O
 	if (enemy_1 != nullptr)
 	{
 		enemy_1->fsm->OnDamageProcess();
-		SetActorLocation(SweepResult.Location);
+		//SetActorLocation(SweepResult.Location);
+		enemy_1->GetCapsuleComponent()->AddImpulse(FVector(-50)*enemy_1->GetActorForwardVector());
+
 	}
 
 	AEnemy_2* enemy_2 = Cast<AEnemy_2>(OtherActor);
@@ -271,6 +271,19 @@ void AVR_Player::EatFood(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	}
 }
 
+void AVR_Player::OpenStatsUI()
+{
+	if (!bShowStatsUI)
+	{
+		statsUIActor = GetWorld()->SpawnActor<AStatsUIActor>(statsUIActorFactory, GetActorTransform());
+		bShowStatsUI = true;
+	}
+	else
+	{
+		GetWorld()->DestroyActor(statsUIActor);
+		bShowStatsUI = false;
+	}
+}
 
 
 
