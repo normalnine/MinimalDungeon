@@ -139,11 +139,11 @@ void UEnemy_2_FSM::DieState()
 		me->Destroy();
 	}
 }
-void UEnemy_2_FSM::OnDamageProcess()
+void UEnemy_2_FSM::OnDamageProcess(float damage)
 {
 
 	//체력감소
-	hp--;
+	hp -= damage;
 	
 	//체력이 남아있다면
 	if (hp > 0)

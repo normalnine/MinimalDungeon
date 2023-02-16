@@ -74,9 +74,10 @@ void UEnemy_4_FSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 //대기상태
 void UEnemy_4_FSM::IdleState()
 {
-	// 1. 시간이 흘렀으니까
+
+	//// 1. 시간이 흘렀으니까
 	currentTime += GetWorld()->DeltaTimeSeconds;
-	// 2. 만약 경과 시간이 대기 시간을 초과했다면
+	//// 2. 만약 경과 시간이 대기 시간을 초과했다면
 	if (currentTime > 1)
 	{
 		// 3. 이동 상태로 전환하고 싶다.
@@ -86,8 +87,8 @@ void UEnemy_4_FSM::IdleState()
 
 
 		// 애니메이션 상태 동기화
-		//anim->animState = mState;
-		// 최초 랜덤한 위치 정해주기
+		anim->animState = mState;
+	//	// 최초 랜덤한 위치 정해주기
 		GetRandomPositionInNavMesh(me->GetActorLocation(), 500, randomPos);
 	}
 		
@@ -95,6 +96,7 @@ void UEnemy_4_FSM::IdleState()
 //이동상태
 void UEnemy_4_FSM::MoveState()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Move"));
 	FVector dir = target->GetActorLocation() - me->GetActorLocation();
 	me->AddMovementInput(dir.GetSafeNormal());
 	auto ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
@@ -113,24 +115,26 @@ void UEnemy_4_FSM::MoveState()
 	{
 		// 타깃쪽으로 이동
 		ai->MoveToLocation(target->GetActorLocation());
+		UE_LOG(LogTemp, Warning, TEXT("Movetotarget"));
 	}
 	else
 	{
 		// 랜덤 위치로 이동
 		auto result = ai->MoveToLocation(randomPos);
+		UE_LOG(LogTemp, Warning, TEXT("Movetorandom"));
 		// 목적지에 도착하면
 		if (result == EPathFollowingRequestResult::AlreadyAtGoal)
 		{
 			// 새로운 랜덤 위치 가져오기
 			GetRandomPositionInNavMesh(me->GetActorLocation(), 500, randomPos);
 		}
-	if (dir.Length() < attackRange)
+	if (dir.Size() < attackRange)
 	{
 		ai->StopMovement();
-
+		UE_LOG(LogTemp, Warning, TEXT("change to attack"));
 		//상태를 Attack 으로 변경
 		EEnemy4State::Attack;
-	//	anim->animState = mState;
+		anim->animState = mState;
 	}
 
 }
@@ -139,7 +143,7 @@ void UEnemy_4_FSM::MoveState()
 void UEnemy_4_FSM::AttackState()
 {
 	currentTime += GetWorld()->DeltaTimeSeconds;
-
+	UE_LOG(LogTemp, Warning, TEXT("attack"));
 	if (currentTime > attackDelayTime)
 	{
 		
@@ -150,7 +154,7 @@ void UEnemy_4_FSM::AttackState()
 	if (dis>attackRange)
 	{
 		mState = EEnemy4State::Move;
-		//anim->animState = mState;
+		anim->animState = mState;
 	}
 
 	
@@ -169,7 +173,7 @@ void UEnemy_4_FSM::DamageState()
 	{
 		mState = EEnemy4State::Move;
 		currentTime = 0;
-		//anim->animState = mState;
+		anim->animState = mState;
 	}
 }
 //죽음상태
@@ -182,9 +186,9 @@ void UEnemy_4_FSM::UpdateReturnPos()
 {
 
 }
-void UEnemy_4_FSM::OnDamageProcess()
+void UEnemy_4_FSM::OnDamageProcess(float damage)
 {
-	hp--;
+	hp -= damage;
 	//체력이 남아있다면
 	if (hp > 0)
 	{
@@ -193,7 +197,7 @@ void UEnemy_4_FSM::OnDamageProcess()
 		currentTime = 0;
 		//피격 애니메이션 재생
 		FString sectionName = FString::Printf(TEXT("Damage0"));
-		//anim->PlayDamageAnim(FName(*sectionName));
+		anim->PlayDamageAnim(FName(*sectionName));
 		
 		//색을 빨간색으로 변경
 
@@ -218,7 +222,7 @@ void UEnemy_4_FSM::OnDamageProcess()
 
 	}
 	ai->StopMovement();
-	//anim->animState = mState;
+	anim->animState = mState;
 }
 bool UEnemy_4_FSM::GetRandomPositionInNavMesh(FVector centerLocation, float radius, FVector& dest)
 {

@@ -49,7 +49,7 @@ void UEnemy_1_FSM::BeginPlay()
 
 	mat = UMaterialInstanceDynamic::Create(me->GetMesh()->GetMaterial(0), this);
 
-	me->GetMesh()->SetMaterial(0,mat);
+	me->GetMesh()->SetMaterial(0, mat);
 }
 
 
@@ -115,34 +115,35 @@ void UEnemy_1_FSM::MoveState()
 	float dist = FVector::Distance(originPos, me->GetActorLocation());
 
 
-	//움직일 수 있는 반경을 넘어갔다면
-	if (dist > moveRange)
-	{
-		//상태를 ReturnPos 로 변경
-		ChangeState(EEnemyState::ReturnPos);
-	}
+	////움직일 수 있는 반경을 넘어갔다면
+	//if (dist > moveRange)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("moveRandom"));
+	//	//ChangeState(EEnemyState::ReturnPos);
+	//	MoveToPos(randPos);
+	//}
 	//시야에 들어왔다면
-	else if (bTrace)
+	if (bTrace)
 	{
-		/*wahng++;
-		UE_LOG(LogTemp, Warning, TEXT("%d"), wahng);*/
-
+		UE_LOG(LogTemp, Warning, TEXT("trace"));
 		//만약에 target - me 거리가 공격범위보다 작으면
 		if (dir.Length() < attackRange)
 		{
-
+			UE_LOG(LogTemp, Warning, TEXT("change attack"));
 			//상태를 Attack 으로 변경
 			ChangeState(EEnemyState::Attack);
 		}
 		//그렇지 않으면
 		else
 		{
+			UE_LOG(LogTemp, Warning, TEXT("movetotarget"));
 			ai->MoveToLocation(target->GetActorLocation());
 		}
 	}
 	//시야에 들어오지 않았다면
 	else
 	{
+		UE_LOG(LogTemp, Warning, TEXT("movetorandpos"));
 		// 랜덤한 위치까지 도착한 후 Idle 상태로 전환
 		MoveToPos(randPos);
 	}
@@ -213,10 +214,10 @@ void UEnemy_1_FSM::UpdateReturnPos()
 {
 	MoveToPos(originPos);
 }
-void UEnemy_1_FSM::OnDamageProcess()
+void UEnemy_1_FSM::OnDamageProcess(float damage)
 {
 	//체력감소
-	hp--;
+	hp -= damage;
 	//체력이 남아있다면
 	if (hp > 0)
 	{
@@ -227,17 +228,17 @@ void UEnemy_1_FSM::OnDamageProcess()
 		FString sectionName = FString::Printf(TEXT("Damage0"));
 		anim->PlayDamageAnim(FName(*sectionName));
 		//색을 빨간색으로 변경
-		
-		mat->SetVectorParameterValue(TEXT("EmissiveColor"),FVector4(1,0,0,1));
-		mat->SetScalarParameterValue(TEXT("Glow"),50.0f);
-	
+
+		mat->SetVectorParameterValue(TEXT("EmissiveColor"), FVector4(1, 0, 0, 1));
+		mat->SetScalarParameterValue(TEXT("Glow"), 50.0f);
+
 		GetWorld()->GetTimerManager().ClearTimer(colorHandle);
 		GetWorld()->GetTimerManager().SetTimer(colorHandle, this, &UEnemy_1_FSM::ColorOff, 0.5f, false);
-		
+
 	}
-		
-	
-	else 
+
+
+	else
 	{
 		//상태를 죽음으로 전환
 		mState = EEnemyState::Die;
@@ -245,7 +246,7 @@ void UEnemy_1_FSM::OnDamageProcess()
 		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		//죽음 애니메이션 재생
 		anim->PlayDamageAnim(TEXT("Die"));
-		
+
 
 	}
 	//애니메이션 상태 동기화
@@ -266,17 +267,18 @@ bool UEnemy_1_FSM::IsTargetTrace()
 
 
 	FVector dir = target->GetActorLocation() - me->GetActorLocation();
+	FVector dirSize = dir;
 	dir.Normalize();
 
 
 	FVector na = me->GetActorLocation();
 	float dotvalue = FVector::DotProduct(na, dir);
 
-	//2번에서 구한 값을 acos
+	//acos
 	float angle = UKismetMathLibrary::DegAcos(dotvalue);
 
-	//3번에서 구한 값이 40보다 작고 적과 플레이어와의 거리가 지정한 거리보다 작으면
-	if (dotvalue < 40 && dir.Length() < traceRange)
+	//구한 값이 40보다 작고 적과 플레이어와의 거리가 지정한 거리보다 작으면
+	if (angle < 40 && dirSize.Size() < traceRange)
 	{
 
 
@@ -377,7 +379,7 @@ void UEnemy_1_FSM::ChangeState(EEnemyState state)
 
 		//Die 몽타주 실행
 		me->PlayAnimMontage(damageMontage, 1.0f, FName(TEXT("Die")));
-		
+
 		break;
 	}
 }
@@ -412,7 +414,7 @@ void UEnemy_1_FSM::MoveToPos(FVector pos)
 }
 void UEnemy_1_FSM::ColorOff()
 {
-	
+
 	mat->SetVectorParameterValue(TEXT("EmissiveColor"), FVector4(1, 1, 1, 1));
 	mat->SetScalarParameterValue(TEXT("Glow"), 0);
 }

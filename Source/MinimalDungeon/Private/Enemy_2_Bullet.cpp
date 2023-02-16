@@ -39,8 +39,8 @@ AEnemy_2_Bullet::AEnemy_2_Bullet()
 void AEnemy_2_Bullet::BeginPlay()
 {
 	Super::BeginPlay();
-	FTimerHandle ddd;
-	GetWorld()->GetTimerManager().SetTimer(ddd,this,&AEnemy_2_Bullet::Die,3.0f,false);
+//	FTimerHandle ddd;
+//	GetWorld()->GetTimerManager().SetTimer(ddd,this,&AEnemy_2_Bullet::Die,3.0f,false);
 
 	auto actor = UGameplayStatics::GetActorOfClass(GetWorld(), AEnemy_2::StaticClass());
 	me = Cast<AEnemy_2>(actor);
@@ -78,21 +78,23 @@ void AEnemy_2_Bullet::OnOverlapBegin(class UPrimitiveComponent* selfComp, class 
 void AEnemy_2_Bullet::returnBack()
 {
 	
-	// Get the sword's velocity vector
-	FVector SwordVelocity = GetVelocity();
+	//// Get the sword's velocity vector
+	//FVector SwordVelocity = GetVelocity();
 
-	// Reflect the bullet's velocity vector along the sword's velocity vector
-	FVector ReflectedVelocity = FMath::GetReflectionVector(GetVelocity(), SwordVelocity);
+	//// Reflect the bullet's velocity vector along the sword's velocity vector
+	//FVector ReflectedVelocity = FMath::GetReflectionVector(GetVelocity(), SwordVelocity);
 
-	// Set the bullet's new velocity
-	SetActorRotation(ReflectedVelocity.Rotation());
-	SetActorLocation(GetActorLocation() + ReflectedVelocity*1000 * GetWorld()->GetDeltaSeconds(), false);
+	//// Set the bullet's new velocity
+	//SetActorRotation(ReflectedVelocity.Rotation());
+	//SetActorLocation(GetActorLocation() + ReflectedVelocity*500 * GetWorld()->GetDeltaSeconds(), false);
 
-	SetActorRotation(me->GetActorRotation());
+	//SetActorRotation(me->GetActorRotation());
 
-// 	FVector dirR = me->GetActorLocation()-GetActorLocation();
-// 	dirR.Normalize();
-// 	FVector p = GetActorLocation() + dirR*50*GetWorld()->DeltaTimeSeconds;
-// 	//FRotator dirRR = dirR.Rotation();
-// 	SetActorLocation(p);
+ 	FVector dirR = me->GetActorLocation()-GetActorLocation();
+ 	//dirR.Normalize();
+ 	FVector p = GetActorLocation() + dirR*10*GetWorld()->DeltaTimeSeconds;
+ 	FRotator dirRR = dirR.Rotation();
+	SetActorRotation(dirRR);
+ 	SetActorLocation(p);
+
 }
