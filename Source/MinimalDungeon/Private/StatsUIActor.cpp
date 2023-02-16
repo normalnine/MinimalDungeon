@@ -25,6 +25,8 @@ void AStatsUIActor::BeginPlay()
 	Super::BeginPlay();
 
 	statsUI = Cast<UStatsUI>(widgetComp->GetWidget());
+
+	statsUI->UpdateStats();
 	
 }
 
@@ -34,4 +36,5 @@ void AStatsUIActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	
 }
+
 

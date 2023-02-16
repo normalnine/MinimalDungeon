@@ -206,7 +206,7 @@ void UEnemy_3_FSM::DieState()
 
 }
 
-void UEnemy_3_FSM::OnDamageProcess(float damage)
+void UEnemy_3_FSM::OnDamageProcess(int32 damage)
 {
 	
 	hp -= damage;

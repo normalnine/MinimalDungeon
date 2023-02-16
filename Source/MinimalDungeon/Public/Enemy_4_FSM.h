@@ -70,7 +70,7 @@ public:
 		int32 hp = 3;
 	//피격 알림 이벤트 함수
 	UFUNCTION(BlueprintCallable)
-		void OnDamageProcess(float damage);
+		void OnDamageProcess(int32 damage);
 	//피격 대기 시간
 	UPROPERTY(EditDefaultsOnly, Category = FSM)
 		float damageDelayTime = 2.0f;

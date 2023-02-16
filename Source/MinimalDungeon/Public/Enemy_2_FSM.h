@@ -47,7 +47,7 @@ public:
 	void DieState();
 	//피격당했을때
 	UFUNCTION(BlueprintCallable)
-	void OnDamageProcess(float damage);
+	void OnDamageProcess(int32 damage);
 
 	//타겟
 	UPROPERTY(VisibleAnywhere, Category = FSM)

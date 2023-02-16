@@ -214,7 +214,7 @@ void UEnemy_1_FSM::UpdateReturnPos()
 {
 	MoveToPos(originPos);
 }
-void UEnemy_1_FSM::OnDamageProcess(float damage)
+void UEnemy_1_FSM::OnDamageProcess(int32 damage)
 {
 	//체력감소
 	hp -= damage;

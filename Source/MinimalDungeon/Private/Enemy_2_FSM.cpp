@@ -139,7 +139,7 @@ void UEnemy_2_FSM::DieState()
 		me->Destroy();
 	}
 }
-void UEnemy_2_FSM::OnDamageProcess(float damage)
+void UEnemy_2_FSM::OnDamageProcess(int32 damage)
 {
 
 	//체력감소

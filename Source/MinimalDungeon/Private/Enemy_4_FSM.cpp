@@ -186,7 +186,7 @@ void UEnemy_4_FSM::UpdateReturnPos()
 {
 
 }
-void UEnemy_4_FSM::OnDamageProcess(float damage)
+void UEnemy_4_FSM::OnDamageProcess(int32 damage)
 {
 	hp -= damage;
 	//체력이 남아있다면

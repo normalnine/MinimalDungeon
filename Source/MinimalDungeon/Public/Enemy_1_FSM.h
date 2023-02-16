@@ -56,7 +56,7 @@ public:
 
 	//피격 알림 이벤트 함수
 	UFUNCTION(BlueprintCallable)
-	void OnDamageProcess(float dmaage);
+	void OnDamageProcess(int32 dmaage);
 
 	//타겠을 쫒아갈수있나?
 	bool IsTargetTrace();

@@ -142,7 +142,7 @@ void UGraspComponent::ReleaseObject()
 	{
 		// 직선 운동
 		
-		if (grabedObject == knife && throwDirection.Size() <10)
+		if (grabedObject == knife && throwDirection.Length() <10)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%.3f, %.3f, %.3f"), throwDirection.X, throwDirection.Y, throwDirection.Z));
 
