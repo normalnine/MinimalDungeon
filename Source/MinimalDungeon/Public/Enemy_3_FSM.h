@@ -15,7 +15,6 @@ enum class EEnemy3State : uint8
 	AttackDelay,
 	Damage,
 	Die,
-	ReturnPos
 };
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MINIMALDUNGEON_API UEnemy_3_FSM : public UActorComponent
@@ -49,8 +48,7 @@ public:
 	void DamageState();
 	//죽음상태
 	void DieState();
-	//리턴
-	void UpdateReturnPos();
+
 
 	//대기시간
 	UPROPERTY(EditDefaultsOnly, Category = FSM)
@@ -75,7 +73,7 @@ public:
 
 	//피격 알림 이벤트 함수
 	UFUNCTION(BlueprintCallable)
-		void OnDamageProcess();
+		void OnDamageProcess(float damage);
 
 	//체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
@@ -135,6 +133,12 @@ public:
 
 	//원래색으로 돌아가는 함수
 	void ColorOff();
+
 	//색깔 나오는 시간 핸들
 	FTimerHandle colorHandle;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = EnemyFactory)
+		TSubclassOf<class AEnemy_3> EnemyFactory;
+
 };

@@ -35,7 +35,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSM)
-		EEnemy4State mState = EEnemy4State::Idle;
+		EEnemy4State mState; //= EEnemy4State::Idle;
 
 	//대기상태
 	void IdleState();
@@ -61,7 +61,7 @@ public:
 	float currentTime = 0;
 	//공격범위
 	UPROPERTY(EditAnywhere, Category = FSM)
-		float attackRange = 150.0f;
+		float attackRange = 500.0f;
 	//공격대기시간
 	UPROPERTY(EditAnywhere, Category = FSM)
 		float attackDelayTime = 2.0f;
@@ -70,7 +70,7 @@ public:
 		int32 hp = 3;
 	//피격 알림 이벤트 함수
 	UFUNCTION(BlueprintCallable)
-		void OnDamageProcess();
+		void OnDamageProcess(float damage);
 	//피격 대기 시간
 	UPROPERTY(EditDefaultsOnly, Category = FSM)
 		float damageDelayTime = 2.0f;

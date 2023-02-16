@@ -56,7 +56,7 @@ public:
 
 	//피격 알림 이벤트 함수
 	UFUNCTION(BlueprintCallable)
-	void OnDamageProcess();
+	void OnDamageProcess(float dmaage);
 
 	//타겠을 쫒아갈수있나?
 	bool IsTargetTrace();
@@ -127,7 +127,7 @@ public:
 	FVector randPos;
 
 	//이동할수있는 범위
-	float moveRange = 3000;
+	float moveRange = 2000;
 
 	//드랍시킬아이템
 	UPROPERTY(EditDefaultsOnly, Category = DropFactory)

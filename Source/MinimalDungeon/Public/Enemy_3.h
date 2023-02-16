@@ -19,4 +19,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
 		class UEnemy_3_FSM* fsm;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FSM)
+		bool hiton = false;
 };

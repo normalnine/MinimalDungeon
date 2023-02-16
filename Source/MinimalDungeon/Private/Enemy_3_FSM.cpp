@@ -13,6 +13,7 @@
 #include <Engine/EngineTypes.h>
 #include <Components/CapsuleComponent.h>
 #include "GameFramework/Actor.h"
+#include <Engine/World.h>
 
 
 // Sets default values for this component's properties
@@ -50,6 +51,7 @@ void UEnemy_3_FSM::BeginPlay()
 	mat = UMaterialInstanceDynamic::Create(me->GetMesh()->GetMaterial(0), this);
 
 	me->GetMesh()->SetMaterial(0, mat);
+
 }
 
 
@@ -78,9 +80,6 @@ void UEnemy_3_FSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	case EEnemy3State::Die:
 		DieState();
 		break;
-	case EEnemy3State::ReturnPos:
-		UpdateReturnPos();
-		break;
 	}
 }
 
@@ -94,38 +93,37 @@ void UEnemy_3_FSM::IdleState()
 
 	else
 	{
-		//idleDelayTime 이 지나면	
+			
 		if (IsWaitComplete(idleDelayTime))
 		{
-			//현재상태를 Move 로 한다.
+			
 			ChangeState(EEnemy3State::Move);
 		}
 	}
 }
 void UEnemy_3_FSM::MoveState()
 {
-	// 시야에 들어왔는지 여부
+	
 	bool bTrace = IsTargetTrace();
 
-	//타겟을 향하는 방향을 구하고
+	//방향
 	FVector dir = target->GetActorLocation() - me->GetActorLocation();
 
-	//처음 위치, 나의 현재 위치의 거리
+	//거리
 	float dist = FVector::Distance(originPos, me->GetActorLocation());
 
 
-	//움직일 수 있는 반경을 넘어갔다면
+	
 	if (dist > moveRange)
 	{
-		//상태를 ReturnPos 로 변경
-		ChangeState(EEnemy3State::ReturnPos);
+		MoveToPos(randPos);
 	}
 	//시야에 들어왔다면
 	else if (bTrace)
 	{
 	
 
-		//만약에 target - me 거리가 공격범위보다 작으면
+		//target - me 거리가 공격범위보다 작으면
 		if (dir.Length() < attackRange)
 		{
 
@@ -141,7 +139,7 @@ void UEnemy_3_FSM::MoveState()
 	//시야에 들어오지 않았다면
 	else
 	{
-		// 랜덤한 위치까지 도착한 후 Idle 상태로 전환
+	
 		MoveToPos(randPos);
 	}
 }
@@ -207,15 +205,12 @@ void UEnemy_3_FSM::DieState()
 
 
 }
-void UEnemy_3_FSM::UpdateReturnPos()
+
+void UEnemy_3_FSM::OnDamageProcess(float damage)
 {
-	MoveToPos(originPos);
-}
-void UEnemy_3_FSM::OnDamageProcess()
-{
-	//체력감소
-	hp--;
-	//체력이 남아있다면
+	
+	hp -= damage;
+	
 	if (hp > 0)
 	{
 		//상태를 피격으로 전환
@@ -231,6 +226,9 @@ void UEnemy_3_FSM::OnDamageProcess()
 
 		GetWorld()->GetTimerManager().ClearTimer(colorHandle);
 		GetWorld()->GetTimerManager().SetTimer(colorHandle, this, &UEnemy_3_FSM::ColorOff, 0.5f, false);
+
+		me->hiton = true;
+		//GetWorld()->SpawnActor<AEnemy_3>(EnemyFactory, me->GetActorTransform());
 
 	}
 
@@ -274,7 +272,7 @@ bool UEnemy_3_FSM::IsTargetTrace()
 	float angle = UKismetMathLibrary::DegAcos(dotvalue);
 
 	//3번에서 구한 값이 30보다 작고 적과 플레이어와의 거리가 지정한 거리보다 작으면
-	if (dotvalue < 30 && dir.Length() < traceRange)
+	if (angle < 30 && dir.Length() < traceRange)
 	{
 
 
@@ -313,7 +311,7 @@ bool UEnemy_3_FSM::IsWaitComplete(float delayTime)
 	}
 
 
-	return false;
+	return true;
 }
 
 void UEnemy_3_FSM::ChangeState(EEnemy3State state)
@@ -336,14 +334,14 @@ void UEnemy_3_FSM::ChangeState(EEnemy3State state)
 	//현재 시간 초기화
 	currTime = 0;
 
-	//ai 의 움직임 멈추자
+	
 	//ai->StopMovement();
 
 	//상태에 따른 초기설정
 	switch (mState)
 	{
 	case EEnemy3State::Attack:
-		//currTime = attackDelayTime;
+		currTime = attackDelayTime;
 		break;
 	case EEnemy3State::Move:
 	{
@@ -357,11 +355,11 @@ void UEnemy_3_FSM::ChangeState(EEnemy3State state)
 	break;
 	case EEnemy3State::Damage:
 	{
-		//1. 랜덤한 값을 뽑는다 (0, 1 중)
-		int32 rand = FMath::RandRange(0, 1);
-		//2. Damage0, Damage1 이란 문자열을 만든다.
+		
+		int32 rand = 0;	
+		
 		FString sectionName = FString::Printf(TEXT("Damage%d"), rand);
-		//3. 몽타주를 플레이한다.
+		
 		me->PlayAnimMontage(damageMontage, 1.0f, FName(*sectionName));
 	}
 	break;
@@ -372,24 +370,7 @@ void UEnemy_3_FSM::ChangeState(EEnemy3State state)
 		//Die 몽타주 실행
 		me->PlayAnimMontage(damageMontage, 1.0f, FName(TEXT("Die")));
 		FTransform dropPos = me->GetTransform();
-		//GetWorld()->SpawnActor<ACoin>(DropFactory, dropPos);
 		break;
-	}
-}
-void UEnemy_3_FSM::ReceiveDamage()
-{
-	//피를 줄이자
-	hp--;
-	//hp 가 0보다 크면 Damage 상태로 전환
-	if (hp > 0)
-	{
-		ChangeState(EEnemy3State::Damage);
-	}
-	//그렇지 않으면 Die 상태로 전환
-	else
-	{
-
-		ChangeState(EEnemy3State::Die);
 	}
 }
 
