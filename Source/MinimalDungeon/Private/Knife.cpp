@@ -34,7 +34,7 @@ void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* Other
 		// 박혀 있는 동안 충돌 안되게 하기 위해 체크
 		if (bKnifeStudded == false)
 		{
-			enemy_1->fsm->OnDamageProcess();
+			enemy_1->fsm->OnDamageProcess(1);
 			sphereComp->SetSimulatePhysics(false);
 			SetActorLocation(enemy_1->GetActorLocation());
 			bKnifeStudded = true;
@@ -46,7 +46,7 @@ void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	{
 		if (bKnifeStudded == false)
 		{
-			enemy_2->fsm->OnDamageProcess();
+			enemy_2->fsm->OnDamageProcess(1);
 			sphereComp->SetSimulatePhysics(false);
 			SetActorLocation(enemy_2->GetActorLocation());
 			bKnifeStudded = true;
@@ -58,7 +58,7 @@ void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	{
 		if (bKnifeStudded == false)
 		{
-			enemy_3->fsm->OnDamageProcess();
+			enemy_3->fsm->OnDamageProcess(1);
 			sphereComp->SetSimulatePhysics(false);
 			SetActorLocation(enemy_3->GetActorLocation());
 			bKnifeStudded = true;
@@ -70,7 +70,7 @@ void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	{
 		if (bKnifeStudded == false)
 		{
-			enemy_4->fsm->OnDamageProcess();
+			enemy_4->fsm->OnDamageProcess(1);
 			sphereComp->SetSimulatePhysics(false);
 			SetActorLocation(enemy_4->GetActorLocation());
 			bKnifeStudded = true;

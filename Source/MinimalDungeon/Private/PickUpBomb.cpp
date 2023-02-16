@@ -41,25 +41,25 @@ void APickUpBomb::Explode()
 				AEnemy_1* enemy_1 = Cast<AEnemy_1>(HitActor);
 				if (enemy_1 != nullptr)
 				{
-					enemy_1->fsm->OnDamageProcess();
+					enemy_1->fsm->OnDamageProcess(1);
 				}
 
 				AEnemy_2* enemy_2 = Cast<AEnemy_2>(HitActor);
 				if (enemy_2 != nullptr)
 				{
-					enemy_2->fsm->OnDamageProcess();
+					enemy_2->fsm->OnDamageProcess(1);
 				}
 
 				AEnemy_3* enemy_3 = Cast<AEnemy_3>(HitActor);
 				if (enemy_3 != nullptr)
 				{
-					enemy_3->fsm->OnDamageProcess();
+					enemy_3->fsm->OnDamageProcess(1);
 				}
 
 				AEnemy_4* enemy_4 = Cast<AEnemy_4>(HitActor);
 				if (enemy_4 != nullptr)
 				{
-					enemy_4->fsm->OnDamageProcess();
+					enemy_4->fsm->OnDamageProcess(1);
 				}
 			
 			}

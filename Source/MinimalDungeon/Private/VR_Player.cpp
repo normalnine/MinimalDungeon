@@ -211,28 +211,25 @@ void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* O
 	AEnemy_1* enemy_1 =  Cast<AEnemy_1>(OtherActor);
 	if (enemy_1 != nullptr)
 	{
-		enemy_1->fsm->OnDamageProcess();
-		//SetActorLocation(SweepResult.Location);
-		enemy_1->GetCapsuleComponent()->AddImpulse(FVector(-50)*enemy_1->GetActorForwardVector());
-
+		enemy_1->fsm->OnDamageProcess(1);
 	}
 
 	AEnemy_2* enemy_2 = Cast<AEnemy_2>(OtherActor);
 	if (enemy_2 != nullptr)
 	{
-		enemy_2->fsm->OnDamageProcess();
+		enemy_2->fsm->OnDamageProcess(1);
 	}
 
 	AEnemy_3* enemy_3 = Cast<AEnemy_3>(OtherActor);
 	if (enemy_3 != nullptr)
 	{
-		enemy_3->fsm->OnDamageProcess();
+		enemy_3->fsm->OnDamageProcess(1);
 	}
 
 	AEnemy_4* enemy_4 = Cast<AEnemy_4>(OtherActor);
 	if (enemy_4 != nullptr)
 	{
-		enemy_4->fsm->OnDamageProcess();
+		enemy_4->fsm->OnDamageProcess(1);
 	}
 
 	AEnemy_2_Bullet* bullet_2 = Cast<AEnemy_2_Bullet>(OtherActor);
