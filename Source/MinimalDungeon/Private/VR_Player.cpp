@@ -31,6 +31,7 @@
 #include "Enemy_3_FSM.h"
 #include "Enemy_4.h"
 #include "Enemy_4_FSM.h"
+#include "StatsUIActor.h"
 
 // Sets default values
 AVR_Player::AVR_Player()
@@ -109,6 +110,12 @@ AVR_Player::AVR_Player()
 	if (tempHMDMesh.Succeeded())
 	{
 		HMD->SetStaticMesh(tempHMDMesh.Object);
+	}
+
+	ConstructorHelpers::FClassFinder<AStatsUIActor> tempStatsUIActor(TEXT("/Script/Engine.Blueprint'/Game/KDH/Blueprints/BP_StatsUIActor.BP_StatsUIActor_C'"));
+	if (tempStatsUIActor.Succeeded())
+	{
+		statsUIActorFactory = tempStatsUIActor.Class;
 	}
 	
 	bUseControllerRotationPitch = true;
@@ -190,6 +197,7 @@ void AVR_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	UEnhancedInputComponent* enhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	if (enhancedInputComponent != nullptr)
 	{
+		enhancedInputComponent->BindAction(leftInputs[0], ETriggerEvent::Started, this, &AVR_Player::OpenStatsUI);
 		moveComp->SetupPlayerInputComponent(enhancedInputComponent);
 		equipComp->SetupPlayerInputComponent(enhancedInputComponent);
 		graspComp->SetupPlayerInputComponent(enhancedInputComponent);
@@ -263,6 +271,19 @@ void AVR_Player::EatFood(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	}
 }
 
+void AVR_Player::OpenStatsUI()
+{
+	if (!bShowStatsUI)
+	{
+		statsUIActor = GetWorld()->SpawnActor<AStatsUIActor>(statsUIActorFactory, GetActorTransform());
+		bShowStatsUI = true;
+	}
+	else
+	{
+		GetWorld()->DestroyActor(statsUIActor);
+		bShowStatsUI = false;
+	}
+}
 
 
 

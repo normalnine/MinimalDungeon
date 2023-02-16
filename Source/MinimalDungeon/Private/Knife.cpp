@@ -54,7 +54,7 @@ void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	} 	
 
 	AEnemy_3* enemy_3 = Cast<AEnemy_3>(OtherActor);
-	if (enemy_2 != nullptr)
+	if (enemy_3 != nullptr)
 	{
 		if (bKnifeStudded == false)
 		{
@@ -72,7 +72,7 @@ void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* Other
 		{
 			enemy_4->fsm->OnDamageProcess();
 			sphereComp->SetSimulatePhysics(false);
-			SetActorLocation(enemy_2->GetActorLocation());
+			SetActorLocation(enemy_4->GetActorLocation());
 			bKnifeStudded = true;
 		}
 	}
