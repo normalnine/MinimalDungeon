@@ -56,7 +56,7 @@ public:
 
 	//피격 알림 이벤트 함수
 	UFUNCTION(BlueprintCallable)
-	void OnDamageProcess(float dmaage);
+	void OnDamageProcess(int32 dmaage);
 
 	//타겠을 쫒아갈수있나?
 	bool IsTargetTrace();
@@ -140,4 +140,10 @@ public:
 	void ColorOff();
 	//색깔 나오는 시간 핸들
 	FTimerHandle colorHandle;
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	class USoundBase* attackSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+		class USoundBase* hitonSound;
 };

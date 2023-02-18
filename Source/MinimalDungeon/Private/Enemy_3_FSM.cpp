@@ -14,6 +14,7 @@
 #include <Components/CapsuleComponent.h>
 #include "GameFramework/Actor.h"
 #include <Engine/World.h>
+#include "Coin.h"
 
 
 // Sets default values for this component's properties
@@ -27,6 +28,16 @@ UEnemy_3_FSM::UEnemy_3_FSM()
 	if (tempMontage.Succeeded())
 	{
 		damageMontage = tempMontage.Object;
+	}
+	ConstructorHelpers::FObjectFinder<USoundBase> tempSound(TEXT("/Script/Engine.SoundWave'/Game/LJW/sound/slime/Splat_01.Splat_01'"));
+	if (tempSound.Succeeded())
+	{
+		attackSound = tempSound.Object;
+	}
+	ConstructorHelpers::FObjectFinder<USoundBase> hittempSound(TEXT("/Script/Engine.SoundWave'/Game/LJW/sound/slime/Splat_21.Splat_21'"));
+	if (hittempSound.Succeeded())
+	{
+		hitonSound = hittempSound.Object;
 	}
 }
 
@@ -146,7 +157,16 @@ void UEnemy_3_FSM::MoveState()
 
 void UEnemy_3_FSM::AttackState()
 {
-	ChangeState(EEnemy3State::AttackDelay);
+	currentTime += GetWorld()->DeltaTimeSeconds;
+
+	if (currentTime > 2)
+	{
+
+		ChangeState(EEnemy3State::AttackDelay);
+
+		currentTime = 0;
+	}
+
 }
 void UEnemy_3_FSM::UpdaetAttackDelay()
 {
@@ -163,14 +183,13 @@ void UEnemy_3_FSM::UpdaetAttackDelay()
 		}
 		else
 		{
-
 			ChangeState(EEnemy3State::Idle);
 		}
 	}
 }
 void UEnemy_3_FSM::DamageState()
 {
-	//damageDelayTime 이 지나면
+	
 	if (IsWaitComplete(damageDelayTime))
 	{
 		//Move 상태
@@ -206,11 +225,11 @@ void UEnemy_3_FSM::DieState()
 
 }
 
-void UEnemy_3_FSM::OnDamageProcess(float damage)
+void UEnemy_3_FSM::OnDamageProcess(int32 damage)
 {
 	
 	hp -= damage;
-	
+	UGameplayStatics::PlaySound2D(GetWorld(), hitonSound);
 	if (hp > 0)
 	{
 		//상태를 피격으로 전환
@@ -219,17 +238,21 @@ void UEnemy_3_FSM::OnDamageProcess(float damage)
 		//피격 애니메이션 재생
 		FString sectionName = FString::Printf(TEXT("Damage0"));
 		anim->PlayDamageAnim(FName(*sectionName));
-		//색을 빨간색으로 변경
 
+		//색을 빨간색으로 변경
 		mat->SetVectorParameterValue(TEXT("EmissiveColor"), FVector4(1, 0, 0, 1));
 		mat->SetScalarParameterValue(TEXT("Glow"), 50.0f);
 
 		GetWorld()->GetTimerManager().ClearTimer(colorHandle);
 		GetWorld()->GetTimerManager().SetTimer(colorHandle, this, &UEnemy_3_FSM::ColorOff, 0.5f, false);
 
-		me->hiton = true;
-		//GetWorld()->SpawnActor<AEnemy_3>(EnemyFactory, me->GetActorTransform());
-
+		if(!me->hiton)
+		{
+			FActorSpawnParameters params;
+			params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			GetWorld()->SpawnActor<AActor>(EnemyFactory, me->GetActorLocation() + me->GetActorRightVector()*200, me->GetActorRotation(), params);
+			me->hiton = true;
+		}
 	}
 
 
@@ -241,6 +264,9 @@ void UEnemy_3_FSM::OnDamageProcess(float damage)
 		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		//죽음 애니메이션 재생
 		anim->PlayDamageAnim(TEXT("Die"));
+		//죽으면 코인 스폰
+		FTransform dropPos = me->GetTransform();
+		GetWorld()->SpawnActor<ACoin>(DropFactory, dropPos);
 
 
 	}
@@ -250,6 +276,7 @@ void UEnemy_3_FSM::OnDamageProcess(float damage)
 }
 bool UEnemy_3_FSM::GetRandomPositionInNavMesh(FVector centerLocation, float radius, FVector& dest)
 {
+	//랜덤위치 지정
 	auto ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
 	FNavLocation loc;
 	bool result = ns->GetRandomReachablePointInRadius(centerLocation, radius, loc);
@@ -268,10 +295,10 @@ bool UEnemy_3_FSM::IsTargetTrace()
 	FVector na = me->GetActorLocation();
 	float dotvalue = FVector::DotProduct(na, dir);
 
-	//2번에서 구한 값을 acos
+	
 	float angle = UKismetMathLibrary::DegAcos(dotvalue);
 
-	//3번에서 구한 값이 30보다 작고 적과 플레이어와의 거리가 지정한 거리보다 작으면
+	//30보다 작고 적과 플레이어와의 거리가 지정한 거리보다 작으면
 	if (angle < 30 && dir.Length() < traceRange)
 	{
 
@@ -317,13 +344,13 @@ bool UEnemy_3_FSM::IsWaitComplete(float delayTime)
 void UEnemy_3_FSM::ChangeState(EEnemy3State state)
 {
 	//상태 변경 로그를 출력하자
-	UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EEnemyState"), true);
-	if (enumPtr != nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s -----> %s"),
-			*enumPtr->GetNameStringByIndex((int32)mState),
-			*enumPtr->GetNameStringByIndex((int32)state));
-	}
+	//UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EEnemyState"), true);
+	//if (enumPtr != nullptr)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("%s -----> %s"),
+	//		*enumPtr->GetNameStringByIndex((int32)mState),
+	//		*enumPtr->GetNameStringByIndex((int32)state));
+	//}
 
 	//현재 상태를 갱신
 	mState = state;
@@ -341,6 +368,7 @@ void UEnemy_3_FSM::ChangeState(EEnemy3State state)
 	switch (mState)
 	{
 	case EEnemy3State::Attack:
+		UGameplayStatics::PlaySound2D(GetWorld(), attackSound);
 		currTime = attackDelayTime;
 		break;
 	case EEnemy3State::Move:
@@ -369,7 +397,8 @@ void UEnemy_3_FSM::ChangeState(EEnemy3State state)
 		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		//Die 몽타주 실행
 		me->PlayAnimMontage(damageMontage, 1.0f, FName(TEXT("Die")));
-		FTransform dropPos = me->GetTransform();
+		
+	
 		break;
 	}
 }

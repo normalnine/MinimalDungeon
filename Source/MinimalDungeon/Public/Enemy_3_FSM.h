@@ -73,7 +73,7 @@ public:
 
 	//피격 알림 이벤트 함수
 	UFUNCTION(BlueprintCallable)
-		void OnDamageProcess(float damage);
+		void OnDamageProcess(int32 damage);
 
 	//체력
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
@@ -139,6 +139,16 @@ public:
 
 
 	UPROPERTY(EditDefaultsOnly, Category = EnemyFactory)
-		TSubclassOf<class AEnemy_3> EnemyFactory;
+		TSubclassOf<class AActor> EnemyFactory;
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+		class USoundBase* attackSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+		class USoundBase* hitonSound;
+
+	//드랍시킬아이템
+	UPROPERTY(EditDefaultsOnly, Category = DropFactory)
+		TSubclassOf<class ACoin> DropFactory;
 
 };

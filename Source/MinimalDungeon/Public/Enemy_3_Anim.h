@@ -18,13 +18,17 @@ class MINIMALDUNGEON_API UEnemy_3_Anim : public UAnimInstance
 public:
 		UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = FSM)
 		EEnemy3State animState;
+
 		UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = FSM)
 			bool battackPlay = false;
+
 		UFUNCTION(BlueprintCallable, Category = FSMEvent)
 		void EndAttackAnimation();
+
 		//피격 애니메이션 재생 함수
 		UFUNCTION(BlueprintImplementableEvent, Category = FSMEvent)
 			void PlayDamageAnim(FName sectionName);
+
 		//죽음 상태 애니메이션 종료 여부
 		UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
 			bool bDieDone = false;

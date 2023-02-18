@@ -47,7 +47,7 @@ public:
 	void DieState();
 	//피격당했을때
 	UFUNCTION(BlueprintCallable)
-	void OnDamageProcess(float damage);
+	void OnDamageProcess(int32 damage);
 
 	//타겟
 	UPROPERTY(VisibleAnywhere, Category = FSM)
@@ -81,4 +81,10 @@ public:
 	void ColorOff();
 	//색깔 나오는 시간 핸들
 	FTimerHandle colorHandle;
+	UPROPERTY()
+		class UEnemy_2_Anim* anim;
+
+	//드랍시킬아이템
+	UPROPERTY(EditDefaultsOnly, Category = DropFactory)
+		TSubclassOf<class ACoin> DropFactory;
 };
