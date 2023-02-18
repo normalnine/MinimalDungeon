@@ -20,4 +20,7 @@ public:
 		//피격 애니메이션 재생 함수
 		UFUNCTION(BlueprintImplementableEvent, Category = FSMEvent)
 			void PlayDamageAnim(FName sectionName);
+		//피격되었는지 확인
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FSM)
+			bool hitme = false;
 };

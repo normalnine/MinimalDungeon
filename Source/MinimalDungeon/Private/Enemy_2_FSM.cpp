@@ -7,6 +7,8 @@
 #include "Enemy_2.h"
 #include <Kismet/GameplayStatics.h>
 #include <Components/CapsuleComponent.h>
+#include "Enemy_2_Anim.h"
+#include "Coin.h"
 
 
 // Sets default values for this component's properties
@@ -31,6 +33,11 @@ void UEnemy_2_FSM::BeginPlay()
 
 	me = Cast<AEnemy_2>(GetOwner());
 	
+	mat2 = UMaterialInstanceDynamic::Create(me->GetMesh()->GetMaterial(0), this);
+
+	me->GetMesh()->SetMaterial(0, mat2);
+
+	anim = Cast<UEnemy_2_Anim>(me->GetMesh()->GetAnimInstance());
 }
 
 
@@ -73,9 +80,11 @@ void UEnemy_2_FSM::IdleState()
 		{
 			mState = EEnemy2State::Attack;
 			currentTime = 0;
+			anim->animState = mState;
 		}
 		
 	}
+	anim->animState = mState;
 }
 //공격상태
 void UEnemy_2_FSM::AttackState()
@@ -139,7 +148,7 @@ void UEnemy_2_FSM::DieState()
 		me->Destroy();
 	}
 }
-void UEnemy_2_FSM::OnDamageProcess(float damage)
+void UEnemy_2_FSM::OnDamageProcess(int32 damage)
 {
 
 	//체력감소
@@ -150,12 +159,17 @@ void UEnemy_2_FSM::OnDamageProcess(float damage)
 	{
 		//상태를 피격으로 전환
 		mState = EEnemy2State::Damage;
-		//currentTime = 0;
-		//mat2->SetVectorParameterValue(TEXT("EmissiveColor"), FVector4(1, 0, 0, 1));
-		//mat2->SetScalarParameterValue(TEXT("Glow"), 50.0f);
 
-		//GetWorld()->GetTimerManager().ClearTimer(colorHandle);
-		//GetWorld()->GetTimerManager().SetTimer(colorHandle, this, &UEnemy_2_FSM::ColorOff, 0.5f, false);
+		FString sectionName = FString::Printf(TEXT("Damage0"));
+		anim->PlayDamageAnim(FName(*sectionName));
+
+
+		//currentTime = 0;
+		mat2->SetVectorParameterValue(TEXT("EmissiveColor"), FVector4(1, 0, 0, 1));
+		mat2->SetScalarParameterValue(TEXT("Glow"), 50.0f);
+
+		GetWorld()->GetTimerManager().ClearTimer(colorHandle);
+		GetWorld()->GetTimerManager().SetTimer(colorHandle, this, &UEnemy_2_FSM::ColorOff, 0.5f, false);
 		
 	}
 	//그렇지않다면
@@ -164,7 +178,9 @@ void UEnemy_2_FSM::OnDamageProcess(float damage)
 		mState = EEnemy2State::Die;
 		//캡슐 충돌체 비활성화
 		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		
+		//죽으면 코인 스폰
+		FTransform dropPos = me->GetTransform();
+		GetWorld()->SpawnActor<ACoin>(DropFactory, dropPos);
 
 	}
 	

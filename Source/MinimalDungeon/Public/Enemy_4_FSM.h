@@ -15,7 +15,8 @@ enum class EEnemy4State : uint8
 	AttackDelay,
 	Damage,
 	Die,
-	ReturnPos
+	ReturnPos,
+	sleep
 };
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class MINIMALDUNGEON_API UEnemy_4_FSM : public UActorComponent
@@ -35,7 +36,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSM)
-		EEnemy4State mState; //= EEnemy4State::Idle;
+		EEnemy4State mState= EEnemy4State::sleep;
 
 	//대기상태
 	void IdleState();
@@ -51,6 +52,8 @@ public:
 	void DieState();
 	//리턴
 	void UpdateReturnPos();
+	//수면
+	void isSleep();
 	//타깃
 	UPROPERTY(VisibleAnywhere, Category = FSM)
 		class AVR_Player* target;
@@ -61,7 +64,7 @@ public:
 	float currentTime = 0;
 	//공격범위
 	UPROPERTY(EditAnywhere, Category = FSM)
-		float attackRange = 500.0f;
+		float attackRange = 300.0f;
 	//공격대기시간
 	UPROPERTY(EditAnywhere, Category = FSM)
 		float attackDelayTime = 2.0f;
@@ -70,7 +73,7 @@ public:
 		int32 hp = 3;
 	//피격 알림 이벤트 함수
 	UFUNCTION(BlueprintCallable)
-		void OnDamageProcess(float damage);
+		void OnDamageProcess(int32 damage);
 	//피격 대기 시간
 	UPROPERTY(EditDefaultsOnly, Category = FSM)
 		float damageDelayTime = 2.0f;
@@ -86,4 +89,45 @@ public:
 	//랜덤 위치 가져오기
 	bool GetRandomPositionInNavMesh(FVector centerLocation, float radius, FVector& dest);
 
+	//타겠을 쫒아갈수있나?
+	bool IsTargetTrace();
+
+	//쫓아 갈 수 있는 범위
+	float traceRange = 1000;
+
+
+	//상태 변경시 한번만 호출 되는 함수
+	void ChangeState(EEnemy4State state);
+
+	//Delay 함수
+	bool IsWaitComplete(float delayTime);
+
+	//대기시간
+	UPROPERTY(EditDefaultsOnly, Category = FSM)
+		float idleDelayTime = 1;
+
+	//처음위치를 담아놓을 변수
+	FVector originPos;
+
+	//랜덤한 위치
+	FVector randPos;
+
+	//해당 위치까지 도착하면 상태를 Idle 로 전환하는 함수
+	void MoveToPos(FVector pos);
+
+	//현재시간
+	float currTime = 0;
+
+	//색바꾸려는 변수
+	class UMaterialInstanceDynamic* mat;
+
+	//원래색으로 돌아가는 함수
+	void ColorOff();
+
+	//색깔 나오는 시간 핸들
+	FTimerHandle colorHandle;
+
+	//드랍시킬아이템
+	UPROPERTY(EditDefaultsOnly, Category = DropFactory)
+		TSubclassOf<class ACoin> DropFactory;
 };

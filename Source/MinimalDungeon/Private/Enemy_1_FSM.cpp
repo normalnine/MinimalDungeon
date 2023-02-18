@@ -27,6 +27,16 @@ UEnemy_1_FSM::UEnemy_1_FSM()
 	{
 		damageMontage = tempMontage.Object;
 	}
+	ConstructorHelpers::FObjectFinder<USoundBase> tempSound(TEXT("/Script/Engine.SoundWave'/Game/LJW/sound/skeleton/Demon_07.Demon_07'"));
+	if (tempSound.Succeeded())
+	{
+		attackSound = tempSound.Object;
+	}
+	ConstructorHelpers::FObjectFinder<USoundBase> hittempSound(TEXT("/Script/Engine.SoundWave'/Game/LJW/sound/skeleton/Demon_20.Demon_20'"));
+	if (hittempSound.Succeeded())
+	{
+		hitonSound = hittempSound.Object;
+	}
 }
 
 
@@ -115,13 +125,6 @@ void UEnemy_1_FSM::MoveState()
 	float dist = FVector::Distance(originPos, me->GetActorLocation());
 
 
-	////움직일 수 있는 반경을 넘어갔다면
-	//if (dist > moveRange)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("moveRandom"));
-	//	//ChangeState(EEnemyState::ReturnPos);
-	//	MoveToPos(randPos);
-	//}
 	//시야에 들어왔다면
 	if (bTrace)
 	{
@@ -214,10 +217,11 @@ void UEnemy_1_FSM::UpdateReturnPos()
 {
 	MoveToPos(originPos);
 }
-void UEnemy_1_FSM::OnDamageProcess(float damage)
+void UEnemy_1_FSM::OnDamageProcess(int32 damage)
 {
 	//체력감소
 	hp -= damage;
+	UGameplayStatics::PlaySound2D(GetWorld(), hitonSound);
 	//체력이 남아있다면
 	if (hp > 0)
 	{
@@ -323,13 +327,13 @@ bool UEnemy_1_FSM::IsWaitComplete(float delayTime)
 void UEnemy_1_FSM::ChangeState(EEnemyState state)
 {
 	//상태 변경 로그를 출력하자
-	UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EEnemyState"), true);
-	if (enumPtr != nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s -----> %s"),
-			*enumPtr->GetNameStringByIndex((int32)mState),
-			*enumPtr->GetNameStringByIndex((int32)state));
-	}
+	//UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EEnemyState"), true);
+	//if (enumPtr != nullptr)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("%s -----> %s"),
+	//		*enumPtr->GetNameStringByIndex((int32)mState),
+	//		*enumPtr->GetNameStringByIndex((int32)state));
+	//}
 
 	//현재 상태를 갱신
 	mState = state;
@@ -347,6 +351,7 @@ void UEnemy_1_FSM::ChangeState(EEnemyState state)
 	switch (mState)
 	{
 	case EEnemyState::Attack:
+		UGameplayStatics::PlaySound2D(GetWorld(),attackSound);
 		//currTime = attackDelayTime;
 		break;
 	case EEnemyState::Move:
@@ -374,6 +379,8 @@ void UEnemy_1_FSM::ChangeState(EEnemyState state)
 		//충돌안되게 설정
 		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+
+		//죽으면 코인 스폰
 		FTransform dropPos = me->GetTransform();
 		GetWorld()->SpawnActor<ACoin>(DropFactory, dropPos);
 
