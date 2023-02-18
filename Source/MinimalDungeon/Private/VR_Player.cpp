@@ -35,6 +35,8 @@
 #include <UMG/Public/Components/WidgetInteractionComponent.h>
 #include "WidgetPointerComponent.h"
 #include "MD_GameInstance.h"
+#include "ClimbComponent.h"
+#include "BuyComponent.h"
 
 // Sets default values
 AVR_Player::AVR_Player()
@@ -52,6 +54,15 @@ AVR_Player::AVR_Player()
 	motionControllerRight = CreateDefaultSubobject<UMotionControllerComponent>(TEXT("motionControllerRight"));
 	motionControllerRight->SetupAttachment(RootComponent);
 	motionControllerRight->MotionSource = "Right";
+
+	sphereCompLeftHand = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent LeftHand"));
+	sphereCompLeftHand->SetupAttachment(motionControllerLeft);
+	sphereCompLeftHand->SetCollisionProfileName(FName("VRPlayerHand"));
+
+	sphereCompRightHand = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent RightHand"));
+	sphereCompRightHand->SetupAttachment(motionControllerRight);
+	sphereCompRightHand->SetCollisionProfileName(FName("VRPlayerHand"));
+
 
 	leftHand = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("leftHand"));
 	leftHand->SetupAttachment(motionControllerLeft);
@@ -132,7 +143,8 @@ AVR_Player::AVR_Player()
 	equipComp = CreateDefaultSubobject<UEquipComponent>(TEXT("Equip Component"));
 	graspComp = CreateDefaultSubobject<UGraspComponent>(TEXT("Grasp Component"));
 	widgetPointerComp = CreateDefaultSubobject<UWidgetPointerComponent>(TEXT("Widget Pointer Component"));
-
+	climbComp = CreateDefaultSubobject<UClimbComponent>(TEXT("Climb Component"));
+	buyComp = CreateDefaultSubobject<UBuyComponent>(TEXT("Buy Component"));
 	currHp = maxHp;
 
 }
@@ -160,14 +172,9 @@ void AVR_Player::BeginPlay()
 	swordCapsuleComp->OnComponentBeginOverlap.AddDynamic(this, &AVR_Player::SwordAttack);	
 	
 
-	FString hpStr = FString::FromInt((int32)currHp);
-	textCompHpNum->SetText(FText::FromString(hpStr));
-
-	FString coinStr = FString::FromInt((int32)currCoin);
-	textCompCoinNum->SetText(FText::FromString(coinStr));
-
-	FString keyStr = FString::FromInt((int32)currKey);
-	textCompKeyNum->SetText(FText::FromString(keyStr));
+	textCompHpNum->SetText(FText::AsNumber(gameInst->hp));
+	textCompCoinNum->SetText(FText::AsNumber(gameInst->coin));
+	textCompKeyNum->SetText(FText::AsNumber(gameInst->key));
 }
 
 // Called every frame
@@ -216,6 +223,8 @@ void AVR_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		equipComp->SetupPlayerInputComponent(enhancedInputComponent);
 		graspComp->SetupPlayerInputComponent(enhancedInputComponent);
 		widgetPointerComp->SetupPlayerInputComponent(enhancedInputComponent);
+		climbComp->SetupPlayerInputComponent(enhancedInputComponent);
+		buyComp->SetupPlayerInputComponent(enhancedInputComponent);
 	}
 }
 
@@ -268,11 +277,11 @@ void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* O
 
 void AVR_Player::ReceiveDamage()
 {
-	currHp--;
+	gameInst->hp--;
 	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 0.3f, 0.3, FLinearColor::Red);	
-	textCompHpNum->SetText(FText::AsNumber(currHp));
+	textCompHpNum->SetText(FText::AsNumber(gameInst->hp));
 
-	if (currHp == 0)
+	if (gameInst->hp < 1)
 	{		
 		UGameplayStatics::OpenLevel(GetWorld(), TEXT("TestMap"));
 	}
@@ -285,8 +294,8 @@ void AVR_Player::EatFood(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	{
 		UE_LOG(LogTemp,Warning,TEXT("foodeat!!"));
 		GetWorld()->DestroyActor(food);
-		currHp++;
-		textCompHpNum->SetText(FText::AsNumber(currHp));
+		gameInst->hp++;
+		textCompHpNum->SetText(FText::AsNumber(gameInst->hp));
 	}
 }
 

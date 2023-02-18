@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include <MotionControllerComponent.h>
 #include "GraspComponent.generated.h"
 
 
@@ -56,9 +57,9 @@ public:
 
 	bool bIsGrab = false;
 	class APickUpActor* grabedObject;
+	class ACellProbActor* cellProb;
 
 
-private:
 	class AVR_Player* player;
 	
 	bool bPhysicsState = false;
@@ -77,7 +78,7 @@ private:
 	void GripRightRelease(const struct FInputActionValue& value);
 
 	void GrapObject(UStaticMeshComponent* selectHand);
-	void ReleaseObject();
+	void ReleaseObject(UStaticMeshComponent* selectHand);
 	void DrawGrabRange();
 	void EquipKnife();
 

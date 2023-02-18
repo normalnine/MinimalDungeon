@@ -33,7 +33,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Inputs")
 	TSubclassOf<class AKnife> swordFactory;
 
-private:
+
 	bool isEquippingSword = true;
 
 	class AVR_Player* player;

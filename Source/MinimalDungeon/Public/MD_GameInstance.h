@@ -29,4 +29,13 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	int32 evasion = 0;
+
+	UPROPERTY(EditAnywhere)
+	int32 hp = 10;
+
+	UPROPERTY(EditAnywhere)
+	int32 key = 0;
+
+	UPROPERTY(EditAnywhere)
+	int32 coin = 0;
 };

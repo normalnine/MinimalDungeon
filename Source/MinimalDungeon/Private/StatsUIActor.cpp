@@ -19,7 +19,7 @@ AStatsUIActor::AStatsUIActor()
 	widgetComp->SetupAttachment(rootComp);
 }
 
-// Called when the game starts or when spawneddddd
+// Called when the game starts or when spawned
 void AStatsUIActor::BeginPlay()
 {
 	Super::BeginPlay();

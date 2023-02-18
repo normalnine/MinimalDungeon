@@ -38,6 +38,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
 	class UStaticMeshComponent* leftHand;
 
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	class USphereComponent* sphereCompLeftHand;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	class USphereComponent* sphereCompRightHand;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite,Category = "VR_Setting | Components")
 	class UStaticMeshComponent* sword;
 
@@ -70,6 +76,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
 	class UGraspComponent* graspComp;	
+
+	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
+	class UBuyComponent* buyComp;
 
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
 	class UCapsuleComponent* swordCapsuleComp;
@@ -106,6 +115,9 @@ public:
 
 	UPROPERTY()
 	class UMD_GameInstance* gameInst;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
+	class UClimbComponent* climbComp;
 
 	UFUNCTION(BlueprintCallable)
 	void ReceiveDamage();
