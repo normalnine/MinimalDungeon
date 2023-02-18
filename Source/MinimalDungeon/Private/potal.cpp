@@ -16,7 +16,7 @@ Apotal::Apotal()
 	collisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComp"));
 	
 	potalEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("potalEffect"));
-	potalEffect->SetupAttachment(potalEffect);
+	potalEffect->SetupAttachment(collisionComp);
 	collisionComp->OnComponentBeginOverlap.AddDynamic(this, &Apotal::OnOverlapBegin);
 
 
