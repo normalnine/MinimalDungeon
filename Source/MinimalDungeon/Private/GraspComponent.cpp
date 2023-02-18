@@ -10,8 +10,7 @@
 #include <Components/TextRenderComponent.h>
 #include <Components/SphereComponent.h>
 #include "Knife.h"
-#include <MotionControllerComponent.h>
-
+#include "CellProbActor.h"
 
 // Sets default values for this component's properties
 UGraspComponent::UGraspComponent()
@@ -81,23 +80,26 @@ void UGraspComponent::GripLeftAction(const struct FInputActionValue& value)
 void UGraspComponent::GripLeftRelease(const struct FInputActionValue& value)
 {
 	bIsGrab = false;
-	ReleaseObject();
+	ReleaseObject(player->leftHand);
 	
 }
 
 void UGraspComponent::GripRightAction(const struct FInputActionValue& value)
 {
-	return;
-	//GrapObject(player->rightHand);
+	if (!player->sword->IsVisible())
+	{
+		GrapObject(player->rightHand);
+	}
 }
 void UGraspComponent::GripRightRelease(const struct FInputActionValue& value)
 {
-	return;
+	bIsGrab = false;
+	ReleaseObject(player->rightHand);
 }
 
 // 물체를 잡는 함수
 void UGraspComponent::GrapObject(UStaticMeshComponent* selectHand)
-{
+{	
 	FVector Center = selectHand->GetComponentLocation();
 	FHitResult hitInfo;
 	FString profileName = FString(TEXT("PickUp"));
@@ -107,6 +109,12 @@ void UGraspComponent::GrapObject(UStaticMeshComponent* selectHand)
 	
 	if (GetWorld()->SweepSingleByChannel(hitInfo, Center, Center, FQuat::Identity, ECC_EngineTraceChannel5, FCollisionShape::MakeSphere(grapDistance), params) && grabedObject == nullptr)
 	{
+// 		cellProb = Cast<ACellProbActor>(hitInfo.GetActor());
+// 		if (cellProb != nullptr)
+// 		{
+// 			cellProb->PotionEffect();
+// 			return;
+// 		}
 		//player->rightLog->SetText(FText::FromString(hitInfo.GetActor()->GetName()));
 		grabedObject = Cast<APickUpActor>(hitInfo.GetActor());
 		
@@ -129,20 +137,19 @@ void UGraspComponent::GrapObject(UStaticMeshComponent* selectHand)
 			hitInfo.GetActor()->AttachToComponent(selectHand, FAttachmentTransformRules::KeepWorldTransform);
 			grabedObject->SetActorRotation(selectHand->GetComponentRotation());
 		}
-
 	}
 
 	bIsGrab = true;
 }
 
-void UGraspComponent::ReleaseObject()
+void UGraspComponent::ReleaseObject(UStaticMeshComponent* selectHand)
 {		
 	// 만일, 잡고 있던 물체가 있다면...
 	if (grabedObject != nullptr)
 	{
 		// 직선 운동
 		
-		if (grabedObject == knife && throwDirection.Size() <10)
+		if (grabedObject == knife && throwDirection.Length() <10)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%.3f, %.3f, %.3f"), throwDirection.X, throwDirection.Y, throwDirection.Z));
 
@@ -176,14 +183,14 @@ void UGraspComponent::ReleaseObject()
 		grabedObject->sphereComp->AddImpulse(throwDirection * throwPower);
 		
 		// 회전값
-		FVector rotAxis = FVector::CrossProduct(prevForward, player->motionControllerLeft->GetForwardVector());
-		float angle = FMath::Acos(FVector::DotProduct(prevForward, player->motionControllerLeft->GetForwardVector()));
+		FVector rotAxis = FVector::CrossProduct(prevForward, selectHand->GetForwardVector());
+		float angle = FMath::Acos(FVector::DotProduct(prevForward, selectHand->GetForwardVector()));
 		angle = FMath::RadiansToDegrees(angle);
 		FVector torque = rotAxis * angle;
 		grabedObject->sphereComp->AddTorqueInDegrees(torque * torquePower, NAME_None, true);
-
-		DrawDebugLine(GetWorld(), player->motionControllerLeft->GetComponentLocation(), player->motionControllerLeft->GetComponentLocation() + throwDirection * 50, FColor::Red, false, -1, 0, 3);
-
+		
+		DrawDebugLine(GetWorld(), selectHand->GetComponentLocation(), selectHand->GetComponentLocation() + throwDirection * 50, FColor::Red, false, -1, 0, 3);
+		
 		// grabedObject 포인터 변수를 nullptr 로 변경한다
 		grabedObject = nullptr;
 	}
@@ -200,28 +207,23 @@ void UGraspComponent::DrawGrabRange()
 }
 
 void UGraspComponent::EquipKnife()
-{
-	
-		if (isEquippingKnife)
+{	
+	if (isEquippingKnife)
+	{
+		knife->sphereComp->SetSimulatePhysics(false);
+		FVector dir = player->leftHand->GetComponentLocation() - knife->GetActorLocation();
+		dir.GetSafeNormal();
+		FVector p = knife->GetActorLocation() + dir * returnSpeed * GetWorld()->DeltaTimeSeconds;
+		knife->SetActorLocation(p);
+	}
+	else
+	{
+		if (!(bIsGrab))
 		{
-			knife->sphereComp->SetSimulatePhysics(false);
-			FVector dir = player->leftHand->GetComponentLocation() - knife->GetActorLocation();
-			dir.GetSafeNormal();
-			FVector p = knife->GetActorLocation() + dir * returnSpeed* GetWorld()->DeltaTimeSeconds;
-			knife->SetActorLocation(p);
-			
-		
+			isEquippingKnife = true;
+			knife = GetWorld()->SpawnActor<AKnife>(knifeFactory, player->leftHand->GetComponentTransform());
 		}
-		else
-		{
-			if (!(bIsGrab))
-			{
-				isEquippingKnife = true;
-				knife = GetWorld()->SpawnActor<AKnife>(knifeFactory, player->leftHand->GetComponentTransform());
-				
-			}
-		
-		}
-		GrapObject(player->leftHand);
-		
+
+	}
+	GrapObject(player->leftHand);
 }

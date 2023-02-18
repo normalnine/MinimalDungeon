@@ -14,6 +14,7 @@
 #include "Enemy_2_FSM.h"
 #include "Enemy_3_FSM.h"
 #include "Enemy_4_FSM.h"
+#include "MD_GameInstance.h"
 
 AKnife::AKnife()
 {
@@ -24,17 +25,29 @@ void AKnife::BeginPlay()
 	Super::BeginPlay();
 	sphereComp->OnComponentBeginOverlap.AddDynamic(this, &AKnife::KnifeAttack);
 	player = Cast<AVR_Player>(GetWorld()->GetFirstPlayerController());
+	gameInst = Cast<UMD_GameInstance>(GetWorld()->GetGameInstance());
 }
 
 void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	knifeAttackDmg += gameInst->knifeDmg;
+
+	if (FMath::RandRange(1, 100) <= gameInst->knifeCrit)
+	{
+		knifeAttackDmg *= 2;
+	}
+	else
+	{
+		knifeAttackDmg = FMath::RandRange(knifeAttackDmg / 2, knifeAttackDmg);
+	}
+
 	AEnemy_1* enemy_1 = Cast<AEnemy_1>(OtherActor);
 	if (enemy_1 != nullptr)
 	{	
 		// 박혀 있는 동안 충돌 안되게 하기 위해 체크
 		if (bKnifeStudded == false)
 		{
-			enemy_1->fsm->OnDamageProcess(1);
+			enemy_1->fsm->OnDamageProcess(knifeAttackDmg);
 			sphereComp->SetSimulatePhysics(false);
 			SetActorLocation(enemy_1->GetActorLocation());
 			bKnifeStudded = true;
@@ -46,7 +59,7 @@ void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	{
 		if (bKnifeStudded == false)
 		{
-			enemy_2->fsm->OnDamageProcess(1);
+			enemy_2->fsm->OnDamageProcess(knifeAttackDmg);
 			sphereComp->SetSimulatePhysics(false);
 			SetActorLocation(enemy_2->GetActorLocation());
 			bKnifeStudded = true;
@@ -58,7 +71,7 @@ void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	{
 		if (bKnifeStudded == false)
 		{
-			enemy_3->fsm->OnDamageProcess(1);
+			enemy_3->fsm->OnDamageProcess(knifeAttackDmg);
 			sphereComp->SetSimulatePhysics(false);
 			SetActorLocation(enemy_3->GetActorLocation());
 			bKnifeStudded = true;
@@ -70,7 +83,7 @@ void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	{
 		if (bKnifeStudded == false)
 		{
-			enemy_4->fsm->OnDamageProcess(1);
+			enemy_4->fsm->OnDamageProcess(knifeAttackDmg);
 			sphereComp->SetSimulatePhysics(false);
 			SetActorLocation(enemy_4->GetActorLocation());
 			bKnifeStudded = true;

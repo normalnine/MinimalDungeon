@@ -32,6 +32,11 @@
 #include "Enemy_4.h"
 #include "Enemy_4_FSM.h"
 #include "StatsUIActor.h"
+#include <UMG/Public/Components/WidgetInteractionComponent.h>
+#include "WidgetPointerComponent.h"
+#include "MD_GameInstance.h"
+#include "ClimbComponent.h"
+#include "BuyComponent.h"
 
 // Sets default values
 AVR_Player::AVR_Player()
@@ -50,6 +55,15 @@ AVR_Player::AVR_Player()
 	motionControllerRight->SetupAttachment(RootComponent);
 	motionControllerRight->MotionSource = "Right";
 
+	sphereCompLeftHand = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent LeftHand"));
+	sphereCompLeftHand->SetupAttachment(motionControllerLeft);
+	sphereCompLeftHand->SetCollisionProfileName(FName("VRPlayerHand"));
+
+	sphereCompRightHand = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent RightHand"));
+	sphereCompRightHand->SetupAttachment(motionControllerRight);
+	sphereCompRightHand->SetCollisionProfileName(FName("VRPlayerHand"));
+
+
 	leftHand = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("leftHand"));
 	leftHand->SetupAttachment(motionControllerLeft);
 	leftHand->SetCollisionEnabled(ECollisionEnabled::NoCollision);	
@@ -59,6 +73,9 @@ AVR_Player::AVR_Player()
 	rightHand->SetupAttachment(motionControllerRight);
 	rightHand->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	rightHand->SetRelativeScale3D(FVector(0.1));
+
+	widgetPointer_right = CreateDefaultSubobject<UWidgetInteractionComponent>(TEXT("Widget Pointer"));
+	widgetPointer_right->SetupAttachment(motionControllerRight);
 
 	swordCapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Sword CapsuleComponent"));
 	swordCapsuleComp->SetupAttachment(motionControllerRight);
@@ -125,7 +142,9 @@ AVR_Player::AVR_Player()
 	moveComp = CreateDefaultSubobject<UMoveComponent>(TEXT("Move Component"));
 	equipComp = CreateDefaultSubobject<UEquipComponent>(TEXT("Equip Component"));
 	graspComp = CreateDefaultSubobject<UGraspComponent>(TEXT("Grasp Component"));
-
+	widgetPointerComp = CreateDefaultSubobject<UWidgetPointerComponent>(TEXT("Widget Pointer Component"));
+	climbComp = CreateDefaultSubobject<UClimbComponent>(TEXT("Climb Component"));
+	buyComp = CreateDefaultSubobject<UBuyComponent>(TEXT("Buy Component"));
 	currHp = maxHp;
 
 }
@@ -145,20 +164,17 @@ void AVR_Player::BeginPlay()
 	UEnhancedInputLocalPlayerSubsystem* subsys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(playerCon->GetLocalPlayer());
 
 	// 3. 가져온 Subsystem 에 IMC 를 등록한다. (우선순위 0번)
-	subsys->AddMappingContext(myMapping, 0);	
+	subsys->AddMappingContext(myMapping, 0);
+
+	gameInst = Cast<UMD_GameInstance>(GetWorld()->GetGameInstance());
 
 	sphereCompHMD->OnComponentBeginOverlap.AddDynamic(this, &AVR_Player::EatFood);
 	swordCapsuleComp->OnComponentBeginOverlap.AddDynamic(this, &AVR_Player::SwordAttack);	
 	
 
-	FString hpStr = FString::FromInt((int32)currHp);
-	textCompHpNum->SetText(FText::FromString(hpStr));
-
-	FString coinStr = FString::FromInt((int32)currCoin);
-	textCompCoinNum->SetText(FText::FromString(coinStr));
-
-	FString keyStr = FString::FromInt((int32)currKey);
-	textCompKeyNum->SetText(FText::FromString(keyStr));
+	textCompHpNum->SetText(FText::AsNumber(gameInst->hp));
+	textCompCoinNum->SetText(FText::AsNumber(gameInst->coin));
+	textCompKeyNum->SetText(FText::AsNumber(gameInst->key));
 }
 
 // Called every frame
@@ -175,7 +191,7 @@ void AVR_Player::Tick(float DeltaTime)
 		}
 		throwDirection = motionControllerRight->GetComponentLocation() - prevLocation;
 
-		if (throwDirection.Size() > 2)
+		if (throwDirection.Length() > 2)
 		{
 			swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			swordCapsuleComp->SetHiddenInGame(false);
@@ -185,6 +201,11 @@ void AVR_Player::Tick(float DeltaTime)
 			swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			swordCapsuleComp->SetHiddenInGame(true);
 		}
+	}
+	else
+	{
+		swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		swordCapsuleComp->SetHiddenInGame(true);
 	}
 
 }
@@ -201,35 +222,48 @@ void AVR_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 		moveComp->SetupPlayerInputComponent(enhancedInputComponent);
 		equipComp->SetupPlayerInputComponent(enhancedInputComponent);
 		graspComp->SetupPlayerInputComponent(enhancedInputComponent);
+		widgetPointerComp->SetupPlayerInputComponent(enhancedInputComponent);
+		climbComp->SetupPlayerInputComponent(enhancedInputComponent);
+		buyComp->SetupPlayerInputComponent(enhancedInputComponent);
 	}
 }
 
 
 void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	swordAttackDmg += gameInst->swordDmg;
 
+	if (FMath::RandRange(1, 100) <= gameInst->swordCrit)
+	{
+		swordAttackDmg *= 2;
+	}
+	else
+	{
+		swordAttackDmg = FMath::RandRange(swordAttackDmg/2, swordAttackDmg);
+	}
+	
 	AEnemy_1* enemy_1 =  Cast<AEnemy_1>(OtherActor);
 	if (enemy_1 != nullptr)
 	{
-		enemy_1->fsm->OnDamageProcess(1);
+		enemy_1->fsm->OnDamageProcess(swordAttackDmg);
 	}
 
 	AEnemy_2* enemy_2 = Cast<AEnemy_2>(OtherActor);
 	if (enemy_2 != nullptr)
 	{
-		enemy_2->fsm->OnDamageProcess(1);
+		enemy_2->fsm->OnDamageProcess(swordAttackDmg);
 	}
 
 	AEnemy_3* enemy_3 = Cast<AEnemy_3>(OtherActor);
 	if (enemy_3 != nullptr)
 	{
-		enemy_3->fsm->OnDamageProcess(1);
+		enemy_3->fsm->OnDamageProcess(swordAttackDmg);
 	}
 
 	AEnemy_4* enemy_4 = Cast<AEnemy_4>(OtherActor);
 	if (enemy_4 != nullptr)
 	{
-		enemy_4->fsm->OnDamageProcess(1);
+		enemy_4->fsm->OnDamageProcess(swordAttackDmg);
 	}
 
 	AEnemy_2_Bullet* bullet_2 = Cast<AEnemy_2_Bullet>(OtherActor);
@@ -243,13 +277,11 @@ void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* O
 
 void AVR_Player::ReceiveDamage()
 {
-	currHp--;
+	gameInst->hp--;
 	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 0.3f, 0.3, FLinearColor::Red);	
+	textCompHpNum->SetText(FText::AsNumber(gameInst->hp));
 
-	FString hpStr = FString::FromInt((int32)currHp);
-	textCompHpNum->SetText(FText::FromString(hpStr));
-
-	if (currHp == 0)
+	if (gameInst->hp < 1)
 	{		
 		UGameplayStatics::OpenLevel(GetWorld(), TEXT("TestMap"));
 	}
@@ -261,10 +293,9 @@ void AVR_Player::EatFood(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	if (food != nullptr)
 	{
 		UE_LOG(LogTemp,Warning,TEXT("foodeat!!"));
-		GetWorld()->DestroyActor(OtherActor);
-		currHp++;
-		FString hpStr = FString::FromInt((int32)currHp);
-		textCompHpNum->SetText(FText::FromString(hpStr));
+		GetWorld()->DestroyActor(food);
+		gameInst->hp++;
+		textCompHpNum->SetText(FText::AsNumber(gameInst->hp));
 	}
 }
 

@@ -5,6 +5,8 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "VR_Player.h"
+#include "ClimbComponent.h"
+#include "GraspComponent.h"
 
 // Sets default values for this component's properties
 UEquipComponent::UEquipComponent()
@@ -46,7 +48,7 @@ void UEquipComponent::EquipSword()
 		player->sword->SetVisibility(isEquippingSword);
 
 	}
-	else
+	else if(!isEquippingSword && !player->graspComp->bIsGrab && !player->climbComp->bClimbing_right)
 	{
 		isEquippingSword = true;
 		player->sword->SetVisibility(isEquippingSword);

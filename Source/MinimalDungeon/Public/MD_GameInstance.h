@@ -15,18 +15,27 @@ class MINIMALDUNGEON_API UMD_GameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
-	UPROPERTY()
-	float swordDmg = 0;
+	UPROPERTY(EditAnywhere)
+	int32 swordDmg = 6;
 
-	UPROPERTY()
-	float swordCrit = 0;
+	UPROPERTY(EditAnywhere)
+	int32 swordCrit = 5;
 	
-	UPROPERTY()
-	float knifeDmg = 0;
+	UPROPERTY(EditAnywhere)
+	int32 knifeDmg = 3;
 
-	UPROPERTY()
-	float knifeCrit = 0;
+	UPROPERTY(EditAnywhere)
+	int32 knifeCrit = 5;
 
-	UPROPERTY()
-	float Evasion = 0;	
+	UPROPERTY(EditAnywhere)
+	int32 evasion = 0;
+
+	UPROPERTY(EditAnywhere)
+	int32 hp = 10;
+
+	UPROPERTY(EditAnywhere)
+	int32 key = 0;
+
+	UPROPERTY(EditAnywhere)
+	int32 coin = 0;
 };
