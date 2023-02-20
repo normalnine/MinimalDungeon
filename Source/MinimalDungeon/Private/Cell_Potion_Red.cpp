@@ -15,8 +15,12 @@ ACell_Potion_Red::ACell_Potion_Red()
 
 void ACell_Potion_Red::PotionEffect()
 {
+	//UE_LOG(LogTemp, Warning, TEXT("childepotion!"));
+
 	if (gameInst->coin >= price)
 	{
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 0.3f, 0.3, FLinearColor::Blue);
+
 		gameInst->swordDmg += 5;
 		gameInst->coin -= price;
 		GetWorld()->DestroyActor(this);

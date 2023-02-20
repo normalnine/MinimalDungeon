@@ -11,6 +11,14 @@
 #include "Enemy_2_FSM.h"
 #include "Enemy_3_FSM.h"
 #include "Enemy_4_FSM.h"
+#include <Components/SkeletalMeshComponent.h>
+
+APickUpBomb::APickUpBomb()
+{
+	skeletalComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh Component"));
+	skeletalComp->SetupAttachment(RootComponent);
+	skeletalComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
 
 void APickUpBomb::BeginPlay()
 {
@@ -20,13 +28,17 @@ void APickUpBomb::BeginPlay()
 
 void APickUpBomb::Explode()
 {
+	if (!IsValid(this))
+	{
+		return;
+	}
 	FVector Center = GetActorLocation();
 	TArray<struct FHitResult> HitResults;
 	FCollisionQueryParams params;
 	FName ProfileName = "Enemy";
 	if (GetWorld()->SweepMultiByProfile(HitResults, Center, Center, FQuat::Identity, ProfileName, FCollisionShape::MakeSphere(exploDistance)))
 	{
-		DrawDebugSphere(GetWorld(), Center, exploDistance, 30, FColor::Cyan, true, 5, 0, 1);
+		DrawDebugSphere(GetWorld(), Center, exploDistance, 30, FColor::Cyan, false, 5, 0, 1);
 
 		for (auto& HitResult : HitResults)
 		{

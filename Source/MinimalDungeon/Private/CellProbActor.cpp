@@ -17,6 +17,7 @@ ACellProbActor::ACellProbActor()
 
 	sphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere Component"));
 	sphereComp->SetCollisionProfileName(FName("CellProb"));
+	sphereComp->SetSphereRadius(20);
 	SetRootComponent(sphereComp);
 	
 	meshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh Component"));
@@ -28,7 +29,7 @@ ACellProbActor::ACellProbActor()
 	widgetComp->SetupAttachment(RootComponent);
 	widgetComp->SetDrawSize(FVector2D(500));
 	widgetComp->SetRelativeRotation(FRotator(0, 180, 0));
-	widgetComp->SetRelativeLocation(FVector(40,0,80));
+	widgetComp->SetRelativeLocation(FVector(20,0,40));
 	widgetComp->SetRelativeScale3D(FVector(0.1));
 	widgetComp->SetVisibility(false);
 
