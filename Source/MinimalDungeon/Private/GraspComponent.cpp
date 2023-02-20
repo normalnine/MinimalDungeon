@@ -11,6 +11,9 @@
 #include <Components/SphereComponent.h>
 #include "Knife.h"
 #include "CellProbActor.h"
+#include "PickUpFood.h"
+#include <UMG/Public/Components/WidgetComponent.h>
+#include "PickUpBomb.h"
 
 // Sets default values for this component's properties
 UGraspComponent::UGraspComponent()
@@ -136,6 +139,12 @@ void UGraspComponent::GrapObject(UStaticMeshComponent* selectHand)
 
 			hitInfo.GetActor()->AttachToComponent(selectHand, FAttachmentTransformRules::KeepWorldTransform);
 			grabedObject->SetActorRotation(selectHand->GetComponentRotation());
+
+			food = Cast<APickUpFood>(grabedObject);
+			if (food != nullptr)
+			{
+				food->widgetComp->SetVisibility(false);
+			}
 		}
 	}
 
@@ -163,14 +172,12 @@ void UGraspComponent::ReleaseObject(UStaticMeshComponent* selectHand)
 		grabedObject->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
 		// 물체의 본래 피직스 on/off 여부를 되돌려준다.
-
+		
 		grabedObject->sphereComp->SetSimulatePhysics(bPhysicsState);
 
 		//FVector dir = grabedObject->GetActorLocation() - prevLocation;
 		//dir.GetSafeNormal();
-		//FVector p = grabedObject->GetActorLocation() + dir * GetWorld()->DeltaTimeSeconds * throwPower;
-
-		
+		//FVector p = grabedObject->GetActorLocation() + dir * GetWorld()->DeltaTimeSeconds * throwPower;		
 		
 		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%.3f, %.3f, %.3f"), player->motionControllerLeft->GetComponentLocation().X, player->motionControllerLeft->GetComponentLocation().Y, player->motionControllerLeft->GetComponentLocation().Z));
 		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%.3f, %.3f, %.3f"), prevLocation.X, prevLocation.Y, prevLocation.Z));
@@ -179,8 +186,15 @@ void UGraspComponent::ReleaseObject(UStaticMeshComponent* selectHand)
 // 
 // 		throwDirection.Normalize();		
 		//GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%.3f, %.3f, %.3f"), throwDirection.X, throwDirection.Y, throwDirection.Z));
-
-		grabedObject->sphereComp->AddImpulse(throwDirection * throwPower);
+		if (grabedObject == knife)
+		{
+			grabedObject->sphereComp->AddImpulse(throwDirection * 10000);
+		}
+		else
+		{
+			grabedObject->sphereComp->AddImpulse(throwDirection * throwPower);
+		}
+		
 		
 		// 회전값
 		FVector rotAxis = FVector::CrossProduct(prevForward, selectHand->GetForwardVector());
@@ -188,6 +202,13 @@ void UGraspComponent::ReleaseObject(UStaticMeshComponent* selectHand)
 		angle = FMath::RadiansToDegrees(angle);
 		FVector torque = rotAxis * angle;
 		grabedObject->sphereComp->AddTorqueInDegrees(torque * torquePower, NAME_None, true);
+
+		bomb = Cast<APickUpBomb>(grabedObject);
+		if (bomb != nullptr)
+		{
+			FTimerHandle exploTimer;
+			GetWorld()->GetTimerManager().SetTimer(exploTimer,bomb,&APickUpBomb::Explode, 3.0f, false);
+		}
 		
 		DrawDebugLine(GetWorld(), selectHand->GetComponentLocation(), selectHand->GetComponentLocation() + throwDirection * 50, FColor::Red, false, -1, 0, 3);
 		

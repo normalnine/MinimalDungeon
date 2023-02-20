@@ -283,6 +283,7 @@ void AVR_Player::ReceiveDamage()
 
 	if (gameInst->hp < 1)
 	{		
+		gameInst->StatsInit();
 		UGameplayStatics::OpenLevel(GetWorld(), TEXT("TestMap"));
 	}
 }
@@ -292,7 +293,7 @@ void AVR_Player::EatFood(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	APickUpFood* food = Cast<APickUpFood>(OtherActor);
 	if (food != nullptr)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("foodeat!!"));
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 0.3f, 0.3, FLinearColor::Green);
 		GetWorld()->DestroyActor(food);
 		gameInst->hp++;
 		textCompHpNum->SetText(FText::AsNumber(gameInst->hp));
@@ -304,6 +305,7 @@ void AVR_Player::OpenStatsUI()
 	if (!bShowStatsUI)
 	{
 		statsUIActor = GetWorld()->SpawnActor<AStatsUIActor>(statsUIActorFactory, GetActorTransform());
+		statsUIActor->SetActorRotation(FRotator(0,0,0));
 		bShowStatsUI = true;
 	}
 	else

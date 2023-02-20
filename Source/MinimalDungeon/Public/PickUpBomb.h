@@ -18,7 +18,13 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	float exploDistance = 30;
+	APickUpBomb();
+
+	UPROPERTY(EditAnywhere)
+	float exploDistance = 100;
+
+	UPROPERTY(EditAnywhere)
+	class USkeletalMeshComponent* skeletalComp;
 	
 	UFUNCTION()
 	void Explode();

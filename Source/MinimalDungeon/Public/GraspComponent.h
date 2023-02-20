@@ -38,7 +38,7 @@ public:
 		float grapDistance = 30.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inputs")
-		float throwPower = 10000.0f;
+		float throwPower = 1000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Inputs")
 		class UInputAction* leftTrigger;
@@ -58,7 +58,8 @@ public:
 	bool bIsGrab = false;
 	class APickUpActor* grabedObject;
 	class ACellProbActor* cellProb;
-
+	class APickUpFood* food;
+	class APickUpBomb* bomb;
 
 	class AVR_Player* player;
 	
