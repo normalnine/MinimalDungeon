@@ -130,4 +130,9 @@ public:
 	//드랍시킬아이템
 	UPROPERTY(EditDefaultsOnly, Category = DropFactory)
 		TSubclassOf<class ACoin> DropFactory;
+
+		void destroyme();
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FSM)
+			bool dam = false;
 };

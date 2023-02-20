@@ -222,6 +222,7 @@ void UEnemy_4_FSM::isSleep()
 void UEnemy_4_FSM::OnDamageProcess(int32 damage)
 {
 	hp -= damage;
+	dam = true;
 	
 	if (hp > 0)
 	{
@@ -253,6 +254,8 @@ void UEnemy_4_FSM::OnDamageProcess(int32 damage)
 	
 		//죽음 애니메이션 재생
 		anim->PlayDamageAnim(TEXT("Die"));
+		FTimerHandle ddd;
+		GetWorld()->GetTimerManager().SetTimer(ddd, this, &UEnemy_4_FSM::destroyme, 4.0f, false);
 
 	}
 	ai->StopMovement();
@@ -407,4 +410,8 @@ void UEnemy_4_FSM::ColorOff()
 {
 	mat->SetVectorParameterValue(TEXT("EmissiveColor"), FVector4(1, 1, 1, 1));
 	mat->SetScalarParameterValue(TEXT("Glow"), 0);
+}
+void UEnemy_4_FSM::destroyme()
+{
+	me->Destroy();
 }

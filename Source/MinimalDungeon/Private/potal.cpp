@@ -44,7 +44,7 @@ void Apotal::OnOverlapBegin(class UPrimitiveComponent* selfComp, class AActor* o
 
 			FString Demo_Map_1;
 			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 1.0f, 2.0f, FLinearColor::Black);
-			UGameplayStatics::OpenLevel(GetWorld(), FName(Demo_Map_1));
+			//UGameplayStatics::OpenLevel(GetWorld(), FName(Demo_Map_1));
 		}
 }
 

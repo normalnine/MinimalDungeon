@@ -222,6 +222,7 @@ void UEnemy_1_FSM::OnDamageProcess(int32 damage)
 	//체력감소
 	hp -= damage;
 	UGameplayStatics::PlaySound2D(GetWorld(), hitonSound);
+	dam = true;
 	//체력이 남아있다면
 	if (hp > 0)
 	{
@@ -239,6 +240,7 @@ void UEnemy_1_FSM::OnDamageProcess(int32 damage)
 		GetWorld()->GetTimerManager().ClearTimer(colorHandle);
 		GetWorld()->GetTimerManager().SetTimer(colorHandle, this, &UEnemy_1_FSM::ColorOff, 0.5f, false);
 
+	
 	}
 
 

@@ -39,8 +39,8 @@ AEnemy_2_Bullet::AEnemy_2_Bullet()
 void AEnemy_2_Bullet::BeginPlay()
 {
 	Super::BeginPlay();
-//	FTimerHandle ddd;
-//	GetWorld()->GetTimerManager().SetTimer(ddd,this,&AEnemy_2_Bullet::Die,3.0f,false);
+	FTimerHandle ddd;
+	GetWorld()->GetTimerManager().SetTimer(ddd,this,&AEnemy_2_Bullet::Die,4.0f,false);
 
 	auto actor = UGameplayStatics::GetActorOfClass(GetWorld(), AEnemy_2::StaticClass());
 	me = Cast<AEnemy_2>(actor);
@@ -69,9 +69,12 @@ void AEnemy_2_Bullet::OnOverlapBegin(class UPrimitiveComponent* selfComp, class 
 	{
 		UE_LOG(LogTemp, Warning, TEXT("OverLap 1"));
 		target->ReceiveDamage();
-			
-// 		
 
+	}
+	AEnemy_2* self = Cast<AEnemy_2>(otherActor);
+	if (self!= nullptr)
+	{
+		self->fsm->OnDamageProcess(1);
 	}
 
 }

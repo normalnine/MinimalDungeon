@@ -146,4 +146,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = Sound)
 		class USoundBase* hitonSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FSM)
+		bool dam = false;
 };
