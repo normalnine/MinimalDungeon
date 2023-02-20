@@ -92,10 +92,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
 		class UTextRenderComponent* textCompCoin;
 
-	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VR_Setting | Components")
 		class UTextRenderComponent* textCompCoinNum;
 
-	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VR_Setting | Components")
 		class UTextRenderComponent* textCompKey;
 
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
