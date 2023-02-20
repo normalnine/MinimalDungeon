@@ -151,4 +151,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = DropFactory)
 		TSubclassOf<class ACoin> DropFactory;
 
+void destroyme();
+
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FSM)
+bool dam = false;
 };

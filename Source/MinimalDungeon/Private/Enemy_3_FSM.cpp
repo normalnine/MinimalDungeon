@@ -230,6 +230,8 @@ void UEnemy_3_FSM::OnDamageProcess(int32 damage)
 	
 	hp -= damage;
 	UGameplayStatics::PlaySound2D(GetWorld(), hitonSound);
+	dam = true;
+
 	if (hp > 0)
 	{
 		//상태를 피격으로 전환
@@ -267,7 +269,9 @@ void UEnemy_3_FSM::OnDamageProcess(int32 damage)
 		//죽으면 코인 스폰
 		FTransform dropPos = me->GetTransform();
 		GetWorld()->SpawnActor<ACoin>(DropFactory, dropPos);
-
+		//시간지나면 디스트로이하기
+		FTimerHandle ddd;
+		GetWorld()->GetTimerManager().SetTimer(ddd, this, &UEnemy_3_FSM::destroyme, 4.0f, false);
 
 	}
 	//애니메이션 상태 동기화
@@ -420,4 +424,8 @@ void UEnemy_3_FSM::ColorOff()
 
 	mat->SetVectorParameterValue(TEXT("EmissiveColor"), FVector4(1, 1, 1, 1));
 	mat->SetScalarParameterValue(TEXT("Glow"), 0);
+}
+void UEnemy_3_FSM::destroyme()
+{
+	me->Destroy();
 }
