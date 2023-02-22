@@ -83,20 +83,30 @@ public:
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
 	class UCapsuleComponent* swordCapsuleComp;
 
+// 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+// 	class UTextRenderComponent* textCompHp;
+	
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
-	class UTextRenderComponent* textCompHp;
+		class UStaticMeshComponent* meshCompHp;
 
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
 	class UTextRenderComponent* textCompHpNum;
 
+
+// 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+// 		class UTextRenderComponent* textCompCoin;
+
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
-		class UTextRenderComponent* textCompCoin;
+		class UStaticMeshComponent* meshCompCoin;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VR_Setting | Components")
-		class UTextRenderComponent* textCompCoinNum;
+	class UTextRenderComponent* textCompCoinNum;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VR_Setting | Components")
 		class UTextRenderComponent* textCompKey;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+		class UStaticMeshComponent* meshCompKey;
 
 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
 		class UTextRenderComponent* textCompKeyNum;
@@ -113,11 +123,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
 	class UWidgetInteractionComponent* widgetPointer_right;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
 	class UMD_GameInstance* gameInst;
 
 	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
 	class UClimbComponent* climbComp;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
+	TSubclassOf <class AActor> hitEffect;
 
 	UFUNCTION(BlueprintCallable)
 	void ReceiveDamage();
@@ -142,8 +155,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float currKey = 0;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 swordAttackDmg = 0;
+	int32 swordAttackDmg;
 
 	UFUNCTION()
 	void SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

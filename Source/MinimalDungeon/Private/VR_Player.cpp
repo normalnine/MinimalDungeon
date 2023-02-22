@@ -37,6 +37,9 @@
 #include "MD_GameInstance.h"
 #include "ClimbComponent.h"
 #include "BuyComponent.h"
+#include "Enemy_5.h"
+#include "Enemy_5_FSM.h"
+
 
 // Sets default values
 AVR_Player::AVR_Player()
@@ -95,18 +98,29 @@ AVR_Player::AVR_Player()
 	HMD->SetupAttachment(sphereCompHMD);
 	HMD->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	textCompHp = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtHp"));
-	textCompHp->SetupAttachment(leftHand);
+// 	textCompHp = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtHp"));
+// 	textCompHp->SetupAttachment(leftHand);
+	meshCompHp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Comp HP"));
+	meshCompHp->SetupAttachment(leftHand);
+	meshCompHp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	textCompHpNum = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtHpNum"));
 	textCompHpNum->SetupAttachment(leftHand);
 
-	textCompCoin = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtCoin"));
-	textCompCoin->SetupAttachment(leftHand);
+// 	textCompCoin = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtCoin"));
+// 	textCompCoin->SetupAttachment(leftHand);
+	meshCompCoin = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Comp Coin"));
+	meshCompCoin->SetupAttachment(leftHand);
+	meshCompCoin->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	textCompCoinNum = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtCoinNum"));
 	textCompCoinNum->SetupAttachment(leftHand);
 
-	textCompKey = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtkey"));
-	textCompKey->SetupAttachment(leftHand);
+// 	textCompKey = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtkey"));
+// 	textCompKey->SetupAttachment(leftHand);
+	meshCompKey = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Comp Key"));
+	meshCompKey->SetupAttachment(leftHand);
+	meshCompKey->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	textCompKeyNum = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtkeyNum"));
 	textCompKeyNum->SetupAttachment(leftHand);
 
@@ -232,6 +246,7 @@ void AVR_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	swordAttackDmg += gameInst->swordDmg;
+	GetWorld()->SpawnActor<AActor>(hitEffect, OverlappedComponent->GetComponentTransform());
 
 	if (FMath::RandRange(1, 100) <= gameInst->swordCrit)
 	{
@@ -273,6 +288,12 @@ void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* O
 		GetWorld()->DestroyActor(OtherActor);
 	
 	}
+
+	AEnemy_5* enemy_5 = Cast<AEnemy_5>(OtherActor);
+	if (enemy_5 != nullptr)
+	{
+		enemy_5->fsm->OnDamageProcess(swordAttackDmg);
+	}
 }
 
 void AVR_Player::ReceiveDamage()
@@ -305,12 +326,13 @@ void AVR_Player::OpenStatsUI()
 	if (!bShowStatsUI)
 	{
 		statsUIActor = GetWorld()->SpawnActor<AStatsUIActor>(statsUIActorFactory, GetActorTransform());
-		statsUIActor->SetActorRotation(FRotator(0,0,0));
+		widgetPointer_right->bShowDebug = true;
 		bShowStatsUI = true;
 	}
 	else
 	{
 		GetWorld()->DestroyActor(statsUIActor);
+		widgetPointer_right->bShowDebug = false;
 		bShowStatsUI = false;
 	}
 }

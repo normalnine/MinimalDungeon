@@ -14,6 +14,7 @@
 #include "PickUpFood.h"
 #include <UMG/Public/Components/WidgetComponent.h>
 #include "PickUpBomb.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values for this component's properties
 UGraspComponent::UGraspComponent()
@@ -188,6 +189,7 @@ void UGraspComponent::ReleaseObject(UStaticMeshComponent* selectHand)
 		//GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%.3f, %.3f, %.3f"), throwDirection.X, throwDirection.Y, throwDirection.Z));
 		if (grabedObject == knife)
 		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), throwSound, player->leftHand->GetComponentLocation());
 			grabedObject->sphereComp->AddImpulse(throwDirection * 10000);
 		}
 		else
@@ -229,7 +231,7 @@ void UGraspComponent::DrawGrabRange()
 
 void UGraspComponent::EquipKnife()
 {	
-	if (isEquippingKnife)
+	if (isEquippingKnife && knife != nullptr)
 	{
 		knife->sphereComp->SetSimulatePhysics(false);
 		FVector dir = player->leftHand->GetComponentLocation() - knife->GetActorLocation();
@@ -242,6 +244,7 @@ void UGraspComponent::EquipKnife()
 		if (!(bIsGrab))
 		{
 			isEquippingKnife = true;
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), equipSound, player->leftHand->GetComponentLocation());
 			knife = GetWorld()->SpawnActor<AKnife>(knifeFactory, player->leftHand->GetComponentTransform());
 		}
 

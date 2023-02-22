@@ -25,6 +25,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class USkeletalMeshComponent* skeletalComp;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf <class AActor> exploEffect;
 	
 	UFUNCTION()
 	void Explode();

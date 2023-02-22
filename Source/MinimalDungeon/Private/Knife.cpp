@@ -15,6 +15,8 @@
 #include "Enemy_3_FSM.h"
 #include "Enemy_4_FSM.h"
 #include "MD_GameInstance.h"
+#include "Enemy_5.h"
+#include "Enemy_5_FSM.h"
 
 AKnife::AKnife()
 {
@@ -31,6 +33,7 @@ void AKnife::BeginPlay()
 void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	knifeAttackDmg += gameInst->knifeDmg;
+	GetWorld()->SpawnActor<AActor>(hitEffect, OverlappedComponent->GetComponentTransform());
 
 	if (FMath::RandRange(1, 100) <= gameInst->knifeCrit)
 	{
@@ -46,7 +49,7 @@ void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	{	
 		// 박혀 있는 동안 충돌 안되게 하기 위해 체크
 		if (bKnifeStudded == false)
-		{
+		{	
 			enemy_1->fsm->OnDamageProcess(knifeAttackDmg);
 			sphereComp->SetSimulatePhysics(false);
 			SetActorLocation(enemy_1->GetActorLocation());
@@ -86,6 +89,18 @@ void AKnife::KnifeAttack(UPrimitiveComponent* OverlappedComponent, AActor* Other
 			enemy_4->fsm->OnDamageProcess(knifeAttackDmg);
 			sphereComp->SetSimulatePhysics(false);
 			SetActorLocation(enemy_4->GetActorLocation());
+			bKnifeStudded = true;
+		}
+	}
+
+	AEnemy_5* enemy_5 = Cast<AEnemy_5>(OtherActor);
+	if (enemy_5 != nullptr)
+	{
+		if (bKnifeStudded == false)
+		{
+			enemy_5->fsm->OnDamageProcess(knifeAttackDmg);
+			sphereComp->SetSimulatePhysics(false);
+			SetActorLocation(enemy_5->GetActorLocation());
 			bKnifeStudded = true;
 		}
 	}

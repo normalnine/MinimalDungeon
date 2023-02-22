@@ -55,6 +55,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Inputs")
 	FVector throwDirection;
 
+	UPROPERTY(EditAnywhere, Category = "Inputs")
+	class USoundBase* equipSound;
+
+	UPROPERTY(EditAnywhere, Category = "Inputs")
+	class USoundBase* throwSound;
+
 	bool bIsGrab = false;
 	class APickUpActor* grabedObject;
 	class ACellProbActor* cellProb;
@@ -70,7 +76,7 @@ public:
 	class AKnife* knife;
 	double velocity = 0;
 	float currTime  = 0;
-	float createTime = 1.0f;
+	float createTime = 0.8f;
 	
 
 	void GripLeftAction(const struct FInputActionValue& value);

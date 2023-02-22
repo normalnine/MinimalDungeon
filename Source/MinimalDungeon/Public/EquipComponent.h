@@ -33,6 +33,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Inputs")
 	TSubclassOf<class AKnife> swordFactory;
 
+	UPROPERTY(EditAnywhere, Category = "Inputs")
+	class USoundBase* equipSound;
 
 	bool isEquippingSword = true;
 
