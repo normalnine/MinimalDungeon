@@ -12,7 +12,7 @@ UWidgetPointerComponent::UWidgetPointerComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
@@ -23,8 +23,7 @@ void UWidgetPointerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	player = Cast<AVR_Player>(GetOwner());
 }
 
 
@@ -33,7 +32,7 @@ void UWidgetPointerComponent::TickComponent(float DeltaTime, ELevelTick TickType
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	player = Cast<AVR_Player>(GetOwner());
+	
 }
 
 void UWidgetPointerComponent::SetupPlayerInputComponent(class UEnhancedInputComponent* PlayerInputComponent)

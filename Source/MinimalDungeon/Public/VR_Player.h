@@ -80,56 +80,56 @@ public:
 	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
 	class UBuyComponent* buyComp;
 
-	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 	class UCapsuleComponent* swordCapsuleComp;
 
 // 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
 // 	class UTextRenderComponent* textCompHp;
 	
-	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 		class UStaticMeshComponent* meshCompHp;
 
-	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 	class UTextRenderComponent* textCompHpNum;
 
 
 // 	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
 // 		class UTextRenderComponent* textCompCoin;
 
-	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 		class UStaticMeshComponent* meshCompCoin;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VR_Setting | Components")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VR_Settings | Components")
 	class UTextRenderComponent* textCompCoinNum;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VR_Setting | Components")
-		class UTextRenderComponent* textCompKey;
+// 	UPROPERTY(EditAnywhere, , Category = "VR_Settings | Components")
+// 		class UTextRenderComponent* textCompKey;
 
-	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 		class UStaticMeshComponent* meshCompKey;
 
-	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VR_Settings | Components")
 		class UTextRenderComponent* textCompKeyNum;
 
-	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 	TSubclassOf<class AStatsUIActor> statsUIActorFactory;
 
-	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 	class AStatsUIActor* statsUIActor;
 
-	UPROPERTY(EditAnywhere, Category = "VR_Setting | Components")
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 	class UWidgetPointerComponent* widgetPointerComp;
 	
-	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 	class UWidgetInteractionComponent* widgetPointer_right;
 
-	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 	class UMD_GameInstance* gameInst;
 
-	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 	class UClimbComponent* climbComp;
 
-	UPROPERTY(EditAnywhere, Category = "VR_Settings|Components")
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 	TSubclassOf <class AActor> hitEffect;
 
 	UFUNCTION(BlueprintCallable)
@@ -165,4 +165,41 @@ public:
 
 	UFUNCTION()
 	void OpenStatsUI();
+
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
+		class UInputAction* buttonB;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
+		class USoundBase* equipSound;
+
+	bool isEquippingSword = true;
+
+	void EquipSword();
+
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
+	class USoundBase* eatingSound;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
+	class UAudioComponent* heartbeatSound;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
+	class USoundBase* openUISound;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
+	class UAudioComponent* swordAudio;
+
+// 	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
+// 	class USoundBase* swordSound;
+
+	void Recenter();
+
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
+		class UInputAction* rightThumbStick;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float soundTime = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float playTime = 1.0f;
+
+	APlayerController* playerController;
 };

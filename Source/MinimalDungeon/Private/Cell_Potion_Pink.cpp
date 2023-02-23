@@ -10,16 +10,11 @@ ACell_Potion_Pink::ACell_Potion_Pink()
 {
 	price = 5;
 	probName = "Pink Potion";
-	probEffect = "Sword Crit +5";
+	probEffect = "Sword Crit +3";
 }
 
 void ACell_Potion_Pink::PotionEffect()
 {
+	gameInst->swordCrit += 3;
 
-	if (gameInst->coin >= price)
-	{
-		gameInst->swordCrit += 5;
-		gameInst->coin -= price;
-		GetWorld()->DestroyActor(this);
-	}
 }

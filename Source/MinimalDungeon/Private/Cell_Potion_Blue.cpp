@@ -11,16 +11,11 @@ ACell_Potion_Blue::ACell_Potion_Blue()
 {
 	price = 5;
 	probName = "Blue Potion";
-	probEffect = "Knife Crit +5";
+	probEffect = "Knife Crit +3";
 }
 
 void ACell_Potion_Blue::PotionEffect()
 {
-	if (gameInst->coin >= price)
-	{
-		gameInst->knifeCrit += 5;
-		gameInst->coin -= price;
-		GetWorld()->DestroyActor(this);
-	}
+	gameInst->knifeCrit += 3;
 }
 

@@ -8,13 +8,14 @@
 #include "CellProbActor.h"
 #include <Components/TextRenderComponent.h>
 #include "MD_GameInstance.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values for this component's properties
 UBuyComponent::UBuyComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
@@ -65,15 +66,26 @@ void UBuyComponent::BuyCellProb(UStaticMeshComponent* selectHand)
 	FCollisionQueryParams params;
 	params.AddIgnoredActor(player);
 	//GetWorld()->SweepSingleByProfile(hitInfo, Center, Center, FQuat::Identity, FName(*profileName), FCollisionShape::MakeSphere(grapDistance), params)
+	DrawDebugSphere(GetWorld(), Center, 10.0f, 30, FColor::Cyan, false, -1, 0, 1);
 
-	if (GetWorld()->SweepSingleByProfile(hitInfo, Center, Center, FQuat::Identity, profileName, FCollisionShape::MakeSphere(30), params))
+	if (GetWorld()->SweepSingleByProfile(hitInfo, Center, Center, FQuat::Identity, profileName, FCollisionShape::MakeSphere(10), params))
 	{
 		cellProb = Cast<ACellProbActor>(hitInfo.GetActor());
 
 		if (IsValid(cellProb))
 		{
-			cellProb->PotionEffect();
-			player->textCompCoinNum->SetText(FText::AsNumber(gameInst->coin));
+			if (gameInst->coin >= cellProb->price)
+			{
+				GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 0.3f, 0.5, FLinearColor::Blue);
+				UGameplayStatics::PlaySound2D(GetWorld(), buffSound);
+				cellProb->PotionEffect();
+				gameInst->coin -= cellProb->price;
+				GetWorld()->DestroyActor(cellProb);
+				player->textCompCoinNum->SetText(FText::AsNumber(gameInst->coin));
+			}
+			
+			//UGameplayStatics::PlaySound2D(GetWorld(), buffSound);
+			
 		}
 	}
 }

@@ -139,6 +139,7 @@ void UGraspComponent::GrapObject(UStaticMeshComponent* selectHand)
 			}
 
 			hitInfo.GetActor()->AttachToComponent(selectHand, FAttachmentTransformRules::KeepWorldTransform);
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), graspSound, player->leftHand->GetComponentLocation());
 			grabedObject->SetActorRotation(selectHand->GetComponentRotation());
 
 			food = Cast<APickUpFood>(grabedObject);
@@ -209,7 +210,7 @@ void UGraspComponent::ReleaseObject(UStaticMeshComponent* selectHand)
 		if (bomb != nullptr)
 		{
 			FTimerHandle exploTimer;
-			GetWorld()->GetTimerManager().SetTimer(exploTimer,bomb,&APickUpBomb::Explode, 3.0f, false);
+			GetWorld()->GetTimerManager().SetTimer(exploTimer,bomb,&APickUpBomb::Explode, 2.0f, false);
 		}
 		
 		DrawDebugLine(GetWorld(), selectHand->GetComponentLocation(), selectHand->GetComponentLocation() + throwDirection * 50, FColor::Red, false, -1, 0, 3);
@@ -237,6 +238,11 @@ void UGraspComponent::EquipKnife()
 		FVector dir = player->leftHand->GetComponentLocation() - knife->GetActorLocation();
 		dir.GetSafeNormal();
 		FVector p = knife->GetActorLocation() + dir * returnSpeed * GetWorld()->DeltaTimeSeconds;
+		if (grabedObject == nullptr)
+		{
+			player->playerController->SetHapticsByValue(1.0f, 1.0f, EControllerHand::Left);
+
+		}
 		knife->SetActorLocation(p);
 	}
 	else

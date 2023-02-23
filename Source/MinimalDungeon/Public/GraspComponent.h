@@ -61,6 +61,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Inputs")
 	class USoundBase* throwSound;
 
+	UPROPERTY(EditAnywhere, Category = "Inputs")
+	class USoundBase* graspSound;
+
 	bool bIsGrab = false;
 	class APickUpActor* grabedObject;
 	class ACellProbActor* cellProb;

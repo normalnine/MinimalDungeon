@@ -32,6 +32,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Inputs")
 		class UInputAction* buttonA;
 
+	UPROPERTY(EditAnywhere, Category = "Inputs")
+	class USoundBase* buffSound;
+
 	class AVR_Player* player;
 
 	class ACellProbActor* cellProb;

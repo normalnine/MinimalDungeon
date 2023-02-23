@@ -28,6 +28,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf <class AActor> exploEffect;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* exploSound;
 	
 	UFUNCTION()
 	void Explode();

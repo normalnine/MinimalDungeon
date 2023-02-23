@@ -31,15 +31,12 @@ public:
 	class UInputAction* buttonY;
 
 	UPROPERTY(EditAnywhere, Category = "Inputs")
-	TSubclassOf<class AKnife> swordFactory;
-
-	UPROPERTY(EditAnywhere, Category = "Inputs")
 	class USoundBase* equipSound;
 
 	bool isEquippingSword = true;
 
 	class AVR_Player* player;
-	class ASword * sword;
+	
 
 
 	void EquipSword();
