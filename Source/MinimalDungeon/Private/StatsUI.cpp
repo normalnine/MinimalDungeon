@@ -36,12 +36,11 @@ void UStatsUI::UpdateStats()
 void UStatsUI::GiveUp()
 {
 	UE_LOG(LogTemp,Warning,TEXT("giveupbutton!"));
-	UGameplayStatics::OpenLevel(GetWorld(), TEXT("TestMap"));
 }
 
 void UStatsUI::GoMain()
 {	
 	UE_LOG(LogTemp, Warning, TEXT("goamainbutton!"));
-	UGameplayStatics::OpenLevel(GetWorld(), TEXT("TestMap"));
+	gameInst->StatsInit();
 }
 

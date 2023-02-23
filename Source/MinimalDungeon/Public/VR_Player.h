@@ -154,7 +154,7 @@ public:
 	float currCoin = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float currKey = 0;
-
+	UPROPERTY(BlueprintReadWrite)
 	int32 swordAttackDmg;
 
 	UFUNCTION()
@@ -202,4 +202,20 @@ public:
 		float playTime = 1.0f;
 
 	APlayerController* playerController;
+
+	void Die();
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf <class AActor> damageUIActorFactory;
+
+	UPROPERTY(EditAnywhere)
+	class ADamageUIActor* damageUIActor;
+
+	UPROPERTY(EditAnywhere)
+		class UDamageUI* damageUI;
+
+	void SpawnDamageUI(AActor* OtherActor);
+
+	
+
 };
