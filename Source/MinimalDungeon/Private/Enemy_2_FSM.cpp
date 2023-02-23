@@ -99,7 +99,7 @@ void UEnemy_2_FSM::AttackState()
 
 	//총알을  소켓 에서 스폰한다
 	GetWorld()->SpawnActor<AEnemy_2_Bullet>(bulletFactory,me->GetMesh()->GetSocketLocation(TEXT("Socket")),dirx);
-
+	
 	//대기로 변경
 	mState = EEnemy2State::AttackDelay;
 

@@ -21,6 +21,12 @@ AKeyActor::AKeyActor()
 
 	collisionComp->SetupAttachment(keybody);
 	collisionComp->OnComponentBeginOverlap.AddDynamic(this, &AKeyActor::OnOverlapBegin);
+
+	ConstructorHelpers::FObjectFinder<USoundBase> TSound(TEXT("/Script/Engine.SoundWave'/Game/LJW/sound/effect/confirm_style_6_001.confirm_style_6_001'"));
+	if (TSound.Succeeded())
+	{
+		Sound = TSound.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -76,6 +82,7 @@ void AKeyActor::moveStop()
 	UMD_GameInstance* gameInst = Cast<UMD_GameInstance>(GetWorld()->GetGameInstance());
 	gameInst->key++;
 	player->textCompKeyNum->SetText(FText::AsNumber(gameInst->key));
+	UGameplayStatics::PlaySound2D(GetWorld(), Sound);
 	Destroy();
 }
 

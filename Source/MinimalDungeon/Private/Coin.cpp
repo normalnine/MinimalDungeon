@@ -21,6 +21,12 @@ ACoin::ACoin()
 
 	collisionComp->SetupAttachment(bodyMeshComp);
 	collisionComp->OnComponentBeginOverlap.AddDynamic(this, &ACoin::OnOverlapBegin);
+
+	ConstructorHelpers::FObjectFinder<USoundBase> TSound(TEXT("/Script/Engine.SoundWave'/Game/LJW/sound/effect/confirm_style_6_001.confirm_style_6_001'"));
+	if (TSound.Succeeded())
+	{
+		Sound = TSound.Object;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -74,6 +80,7 @@ void ACoin::moveStop()
 		UMD_GameInstance* gameInst = Cast<UMD_GameInstance>(GetWorld()->GetGameInstance());
 		gameInst->coin++;
 		player->textCompCoinNum->SetText(FText::AsNumber(gameInst->coin));
+		UGameplayStatics::PlaySound2D(GetWorld(), Sound);
 		Destroy();
 	
 	

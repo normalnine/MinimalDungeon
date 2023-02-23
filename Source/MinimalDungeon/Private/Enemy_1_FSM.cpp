@@ -154,7 +154,15 @@ void UEnemy_1_FSM::MoveState()
 }
 
 void UEnemy_1_FSM::AttackState()
-{
+{	
+	FVector des = target->GetActorLocation();
+
+	FVector dir = des - me->GetActorLocation();
+
+	FRotator dirx = dir.Rotation();
+
+	me->SetActorRotation(dirx);
+
 	ChangeState(EEnemyState::AttackDelay);
 }
 void UEnemy_1_FSM::UpdaetAttackDelay()
@@ -223,7 +231,7 @@ void UEnemy_1_FSM::OnDamageProcess(int32 damage)
 	//체력감소
 	hp -= damage;
 	UGameplayStatics::PlaySound2D(GetWorld(), hitonSound);
-	me->dam = true;
+	//me->dam = true;
 	showdamage = damage;
 
 

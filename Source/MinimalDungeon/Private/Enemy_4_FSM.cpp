@@ -21,7 +21,16 @@ UEnemy_4_FSM::UEnemy_4_FSM()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	ConstructorHelpers::FObjectFinder<USoundBase> hittempSound(TEXT("/Script/Engine.SoundWave'/Game/LJW/sound/effect/Arcade_Creature_Hit_Pop_2.Arcade_Creature_Hit_Pop_2'"));
+	if (hittempSound.Succeeded())
+	{
+		hitonSound = hittempSound.Object;
+	}
+	ConstructorHelpers::FObjectFinder<USoundBase> DDDSound(TEXT("/Script/Engine.SoundWave'/Game/LJW/sound/effect/Arcade_Creature_Hit_Pop_2.Arcade_Creature_Hit_Pop_2'"));
+	if (hittempSound.Succeeded())
+	{
+		DieSound = DDDSound.Object;
+	}
 }
 
 
@@ -145,6 +154,14 @@ void UEnemy_4_FSM::MoveState()
 //공격상태
 void UEnemy_4_FSM::AttackState()
 {
+	FVector des = target->GetActorLocation();
+
+	FVector dir = des - me->GetActorLocation();
+
+	FRotator dirx = dir.Rotation();
+
+	me->SetActorRotation(dirx);
+
 	ChangeState(EEnemy4State::AttackDelay);
 	
 }
@@ -225,8 +242,11 @@ void UEnemy_4_FSM::OnDamageProcess(int32 damage)
 	dam = true;
 	//me->dam = true;
 	showdamage = damage;
+
+	
 	if (hp > 0)
 	{
+		UGameplayStatics::PlaySound2D(GetWorld(), hitonSound);
 		ChangeState(EEnemy4State::Damage);
 
 		//피격되면 트류
@@ -240,7 +260,7 @@ void UEnemy_4_FSM::OnDamageProcess(int32 damage)
 		GetWorld()->GetTimerManager().ClearTimer(colorHandle);
 		GetWorld()->GetTimerManager().SetTimer(colorHandle, this, &UEnemy_4_FSM::ColorOff, 0.5f, false);
 
-		//죽으면 코인 스폰
+		
 		FTransform dropPos = me->GetTransform();
 		GetWorld()->SpawnActor<ACoin>(DropFactory, dropPos);
 	}
@@ -248,6 +268,7 @@ void UEnemy_4_FSM::OnDamageProcess(int32 damage)
 
 	else
 	{
+		UGameplayStatics::PlaySound2D(GetWorld(), DieSound);
 		//상태를 죽음으로 전환
 		mState = EEnemy4State::Die;
 		//캡슐 충돌체 비활성화

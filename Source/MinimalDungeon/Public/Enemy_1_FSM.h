@@ -97,7 +97,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = FSM)
 		float attackDelayTime = 2.0f;
 	//체력
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FSM)
 		int32 hp = 3;
 	//피격 대기 시간
 	UPROPERTY(EditDefaultsOnly, Category = FSM)
