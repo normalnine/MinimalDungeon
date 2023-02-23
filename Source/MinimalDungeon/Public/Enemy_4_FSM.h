@@ -138,4 +138,10 @@ public:
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FSM)
 			int32 showdamage = 0;
+
+		UPROPERTY(EditDefaultsOnly, Category = Sound)
+			class USoundBase* hitonSound;
+
+		UPROPERTY(EditDefaultsOnly, Category = Sound)
+			class USoundBase* DieSound;
 };

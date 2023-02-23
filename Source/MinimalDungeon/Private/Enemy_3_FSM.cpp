@@ -159,6 +159,15 @@ void UEnemy_3_FSM::AttackState()
 {
 	currentTime += GetWorld()->DeltaTimeSeconds;
 
+	FVector des = target->GetActorLocation();
+
+	FVector dir = des - me->GetActorLocation();
+
+	FRotator dirx = dir.Rotation();
+
+	me->SetActorRotation(dirx);
+
+
 	if (currentTime > 2)
 	{
 

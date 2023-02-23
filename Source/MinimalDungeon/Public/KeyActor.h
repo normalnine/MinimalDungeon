@@ -44,4 +44,8 @@ public:
 	UPROPERTY()
 	class AVR_Player* player;
 
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+		class USoundBase* Sound;
+
 };
