@@ -120,7 +120,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 	class UWidgetPointerComponent* widgetPointerComp;
 	
-	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VR_Settings | Components")
 	class UWidgetInteractionComponent* widgetPointer_right;
 
 	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
