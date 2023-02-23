@@ -35,11 +35,12 @@ void UStatsUI::UpdateStats()
 
 void UStatsUI::GiveUp()
 {
-	return;
+	UE_LOG(LogTemp,Warning,TEXT("giveupbutton!"));
 }
 
 void UStatsUI::GoMain()
 {	
+	UE_LOG(LogTemp, Warning, TEXT("goamainbutton!"));
 	gameInst->StatsInit();
 }
 

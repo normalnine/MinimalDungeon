@@ -108,12 +108,16 @@ AVR_Player::AVR_Player()
 	HMD->SetupAttachment(sphereCompHMD);
 	HMD->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+// 	textCompHp = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtHp"));
+// 	textCompHp->SetupAttachment(leftHand);
 	meshCompHp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Comp HP"));
 	meshCompHp->SetupAttachment(leftHand);
 	meshCompHp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	textCompHpNum = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtHpNum"));
 	textCompHpNum->SetupAttachment(leftHand);
 
+// 	textCompCoin = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtCoin"));
+// 	textCompCoin->SetupAttachment(leftHand);
 	meshCompCoin = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Comp Coin"));
 	meshCompCoin->SetupAttachment(leftHand);
 	meshCompCoin->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -121,6 +125,8 @@ AVR_Player::AVR_Player()
 	textCompCoinNum = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtCoinNum"));
 	textCompCoinNum->SetupAttachment(leftHand);
 
+// 	textCompKey = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtkey"));
+// 	textCompKey->SetupAttachment(leftHand);
 	meshCompKey = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Comp Key"));
 	meshCompKey->SetupAttachment(leftHand);
 	meshCompKey->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -199,6 +205,8 @@ void AVR_Player::BeginPlay()
 	textCompHpNum->SetText(FText::AsNumber(gameInst->hp));
 	textCompCoinNum->SetText(FText::AsNumber(gameInst->coin));
 	textCompKeyNum->SetText(FText::AsNumber(gameInst->key));
+
+	//heartbeatSound->Stop();
 
 	playerController = GetWorld()->GetFirstPlayerController();
 
@@ -292,7 +300,10 @@ void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* O
 	if (enemy_1 != nullptr)
 	{
 		SpawnDamageUI(OtherActor);
-		enemy_1->fsm->OnDamageProcess(swordAttackDmg);		
+		enemy_1->fsm->OnDamageProcess(swordAttackDmg);
+		
+
+		
 	}
 
 	AEnemy_2* enemy_2 = Cast<AEnemy_2>(OtherActor);
@@ -354,7 +365,7 @@ void AVR_Player::ReceiveDamage()
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.5f);
 		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 1.0f, 1.0f, FLinearColor::Red);
 		FTimerHandle deathTimer;
-		GetWorldTimerManager().SetTimer(deathTimer, this, &AVR_Player::Die, 1.0f);		
+		GetWorldTimerManager().SetTimer(deathTimer, this, &AVR_Player::Die, 1.5f);		
 	}
 }
 

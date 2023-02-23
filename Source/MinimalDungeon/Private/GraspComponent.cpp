@@ -48,7 +48,7 @@ void UGraspComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 	if (bIsGrab)
 	{
-		//DrawGrabRange();
+		DrawGrabRange();
 		if (IsValid(grabedObject))
 		{
 			currTime += DeltaTime;
@@ -73,6 +73,7 @@ void UGraspComponent::SetupPlayerInputComponent(class UEnhancedInputComponent* P
 	PlayerInputComponent->BindAction(grip_right, ETriggerEvent::Completed, this, &UGraspComponent::GripRightRelease);
 
 	PlayerInputComponent->BindAction(leftTrigger, ETriggerEvent::Triggered, this, &UGraspComponent::EquipKnife);
+	//PlayerInputComponent->BindAction(leftTrigger, ETriggerEvent::Triggered, this, &UGraspComponent::GrabKnife);
 	PlayerInputComponent->BindAction(leftTrigger, ETriggerEvent::Completed, this, &UGraspComponent::GripLeftRelease);
 }
 
@@ -108,9 +109,17 @@ void UGraspComponent::GrapObject(UStaticMeshComponent* selectHand)
 	FString profileName = FString(TEXT("PickUp"));
 	FCollisionQueryParams params;
 	params.AddIgnoredActor(player);
+	//GetWorld()->SweepSingleByProfile(hitInfo, Center, Center, FQuat::Identity, FName(*profileName), FCollisionShape::MakeSphere(grapDistance), params)
 	
 	if (GetWorld()->SweepSingleByChannel(hitInfo, Center, Center, FQuat::Identity, ECC_EngineTraceChannel5, FCollisionShape::MakeSphere(grapDistance), params) && grabedObject == nullptr)
 	{
+// 		cellProb = Cast<ACellProbActor>(hitInfo.GetActor());
+// 		if (cellProb != nullptr)
+// 		{
+// 			cellProb->PotionEffect();
+// 			return;
+// 		}
+		//player->rightLog->SetText(FText::FromString(hitInfo.GetActor()->GetName()));
 		grabedObject = Cast<APickUpActor>(hitInfo.GetActor());
 		
 		if (IsValid(grabedObject))
@@ -153,7 +162,7 @@ void UGraspComponent::ReleaseObject(UStaticMeshComponent* selectHand)
 		
 		if (grabedObject == knife && throwDirection.Length() <10)
 		{
-			//GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%.3f, %.3f, %.3f"), throwDirection.X, throwDirection.Y, throwDirection.Z));
+			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%.3f, %.3f, %.3f"), throwDirection.X, throwDirection.Y, throwDirection.Z));
 
 			GetWorld()->DestroyActor(grabedObject);
 			isEquippingKnife = false;
@@ -168,8 +177,17 @@ void UGraspComponent::ReleaseObject(UStaticMeshComponent* selectHand)
 		
 		grabedObject->sphereComp->SetSimulatePhysics(bPhysicsState);
 
-// 		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%.3f, %.3f, %.3f"), player->motionControllerLeft->GetComponentLocation().X, player->motionControllerLeft->GetComponentLocation().Y, player->motionControllerLeft->GetComponentLocation().Z));
-// 		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%.3f, %.3f, %.3f"), prevLocation.X, prevLocation.Y, prevLocation.Z));
+		//FVector dir = grabedObject->GetActorLocation() - prevLocation;
+		//dir.GetSafeNormal();
+		//FVector p = grabedObject->GetActorLocation() + dir * GetWorld()->DeltaTimeSeconds * throwPower;		
+		
+		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%.3f, %.3f, %.3f"), player->motionControllerLeft->GetComponentLocation().X, player->motionControllerLeft->GetComponentLocation().Y, player->motionControllerLeft->GetComponentLocation().Z));
+		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%.3f, %.3f, %.3f"), prevLocation.X, prevLocation.Y, prevLocation.Z));
+// 		// 직선 운동
+// 		FVector throwDirection = player->motionControllerLeft->GetComponentLocation() - prevLocation;
+// 
+// 		throwDirection.Normalize();		
+		//GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%.3f, %.3f, %.3f"), throwDirection.X, throwDirection.Y, throwDirection.Z));
 		if (grabedObject == knife)
 		{
 			UGameplayStatics::PlaySoundAtLocation(GetWorld(), throwSound, player->leftHand->GetComponentLocation());
@@ -195,7 +213,7 @@ void UGraspComponent::ReleaseObject(UStaticMeshComponent* selectHand)
 			GetWorld()->GetTimerManager().SetTimer(exploTimer,bomb,&APickUpBomb::Explode, 2.0f, false);
 		}
 		
-		//DrawDebugLine(GetWorld(), selectHand->GetComponentLocation(), selectHand->GetComponentLocation() + throwDirection * 50, FColor::Red, false, -1, 0, 3);
+		DrawDebugLine(GetWorld(), selectHand->GetComponentLocation(), selectHand->GetComponentLocation() + throwDirection * 50, FColor::Red, false, -1, 0, 3);
 		
 		// grabedObject 포인터 변수를 nullptr 로 변경한다
 		grabedObject = nullptr;
@@ -209,8 +227,7 @@ void UGraspComponent::ReleaseObject(UStaticMeshComponent* selectHand)
 void UGraspComponent::DrawGrabRange()
 {
 	// 선 그리기 (Sphere)
-	//DrawDebugSphere(GetWorld(), player->leftHand->GetComponentLocation(), grapDistance, 30, FColor::Cyan, false, -1, 0, 1);
-	return;
+	DrawDebugSphere(GetWorld(), player->leftHand->GetComponentLocation(), grapDistance, 30, FColor::Cyan, false, -1, 0, 1);
 }
 
 void UGraspComponent::EquipKnife()
@@ -223,7 +240,7 @@ void UGraspComponent::EquipKnife()
 		FVector p = knife->GetActorLocation() + dir * returnSpeed * GetWorld()->DeltaTimeSeconds;
 		if (grabedObject == nullptr)
 		{
-			player->playerController->SetHapticsByValue(1.0f, 0.5f, EControllerHand::Left);
+			player->playerController->SetHapticsByValue(1.0f, 1.0f, EControllerHand::Left);
 
 		}
 		knife->SetActorLocation(p);

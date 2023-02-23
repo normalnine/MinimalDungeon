@@ -56,29 +56,35 @@ void APickUpBomb::Explode()
 				AEnemy_1* enemy_1 = Cast<AEnemy_1>(HitActor);
 				if (enemy_1 != nullptr)
 				{
-					enemy_1->fsm->OnDamageProcess(10);
+					enemy_1->fsm->OnDamageProcess(1);
 				}
 
 				AEnemy_2* enemy_2 = Cast<AEnemy_2>(HitActor);
 				if (enemy_2 != nullptr)
 				{
-					enemy_2->fsm->OnDamageProcess(10);
+					enemy_2->fsm->OnDamageProcess(1);
 				}
 
 				AEnemy_3* enemy_3 = Cast<AEnemy_3>(HitActor);
 				if (enemy_3 != nullptr)
 				{
-					enemy_3->fsm->OnDamageProcess(10);
+					enemy_3->fsm->OnDamageProcess(1);
 				}
 
 				AEnemy_4* enemy_4 = Cast<AEnemy_4>(HitActor);
 				if (enemy_4 != nullptr)
 				{
-					enemy_4->fsm->OnDamageProcess(10);
-				}			
+					enemy_4->fsm->OnDamageProcess(1);
+				}
+			
 			}
 		}
 	}
+
+	// 사운드, 이펙트
+	//UGameplayStatics::PlaySoundAtLocation(GetWorld(), ExplosionSound, GetActorLocation());
+	//UGameplayStatics::PlayWorldCameraShake(GetWorld(), ExplosionCameraShake, GetActorLocation(), ExplosionRadius, ExplosionCameraShakeInnerRadius);
+	UE_LOG(LogTemp,Warning,TEXT("Bomb!!!"));
 	Destroy();
 }
 
