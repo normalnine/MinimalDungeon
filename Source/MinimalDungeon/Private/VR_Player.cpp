@@ -14,7 +14,7 @@
 #include "InputMappingContext.h"
 #include "InputActionValue.h"
 #include "MoveComponent.h"
-#include "EquipComponent.h"
+/*#include "EquipComponent.h"*/
 #include "GraspComponent.h"
 #include <Components/CapsuleComponent.h>
 #include <Components/TextRenderComponent.h>
@@ -37,6 +37,15 @@
 #include "MD_GameInstance.h"
 #include "ClimbComponent.h"
 #include "BuyComponent.h"
+#include "Enemy_5.h"
+#include "Enemy_5_FSM.h"
+#include <Sound/SoundCue.h>
+#include <Sound/SoundWave.h>
+#include <Components/AudioComponent.h>
+#include "Engine/GameViewportClient.h"
+#include "GameFramework/PlayerController.h"
+#include <Haptics/HapticFeedbackEffect_Base.h>
+
 
 // Sets default values
 AVR_Player::AVR_Player()
@@ -95,21 +104,37 @@ AVR_Player::AVR_Player()
 	HMD->SetupAttachment(sphereCompHMD);
 	HMD->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	textCompHp = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtHp"));
-	textCompHp->SetupAttachment(leftHand);
+// 	textCompHp = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtHp"));
+// 	textCompHp->SetupAttachment(leftHand);
+	meshCompHp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Comp HP"));
+	meshCompHp->SetupAttachment(leftHand);
+	meshCompHp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	textCompHpNum = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtHpNum"));
 	textCompHpNum->SetupAttachment(leftHand);
 
-	textCompCoin = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtCoin"));
-	textCompCoin->SetupAttachment(leftHand);
+// 	textCompCoin = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtCoin"));
+// 	textCompCoin->SetupAttachment(leftHand);
+	meshCompCoin = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Comp Coin"));
+	meshCompCoin->SetupAttachment(leftHand);
+	meshCompCoin->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	textCompCoinNum = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtCoinNum"));
 	textCompCoinNum->SetupAttachment(leftHand);
 
-	textCompKey = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtkey"));
-	textCompKey->SetupAttachment(leftHand);
+// 	textCompKey = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtkey"));
+// 	textCompKey->SetupAttachment(leftHand);
+	meshCompKey = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh Comp Key"));
+	meshCompKey->SetupAttachment(leftHand);
+	meshCompKey->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	textCompKeyNum = CreateDefaultSubobject<UTextRenderComponent>(TEXT("txtkeyNum"));
 	textCompKeyNum->SetupAttachment(leftHand);
 
+	heartbeatSound = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
+	heartbeatSound->SetupAttachment(cameraComponent);
+
+	swordAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("Sword Audio Component"));
+	swordAudio->SetupAttachment(swordCapsuleComp);
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> tempLeftMesh(TEXT("StaticMesh'/Engine/BasicShapes/Cube.Cube'"));
 	if (tempLeftMesh.Succeeded())
@@ -140,13 +165,14 @@ AVR_Player::AVR_Player()
 
 	// 액터 컴포넌트들 추가
 	moveComp = CreateDefaultSubobject<UMoveComponent>(TEXT("Move Component"));
-	equipComp = CreateDefaultSubobject<UEquipComponent>(TEXT("Equip Component"));
+// 	equipComp = CreateDefaultSubobject<UEquipComponent>(TEXT("Equip Component"));
 	graspComp = CreateDefaultSubobject<UGraspComponent>(TEXT("Grasp Component"));
 	widgetPointerComp = CreateDefaultSubobject<UWidgetPointerComponent>(TEXT("Widget Pointer Component"));
 	climbComp = CreateDefaultSubobject<UClimbComponent>(TEXT("Climb Component"));
 	buyComp = CreateDefaultSubobject<UBuyComponent>(TEXT("Buy Component"));
 	currHp = maxHp;
-
+	
+	
 }
 
 // Called when the game starts or when spawned
@@ -175,6 +201,12 @@ void AVR_Player::BeginPlay()
 	textCompHpNum->SetText(FText::AsNumber(gameInst->hp));
 	textCompCoinNum->SetText(FText::AsNumber(gameInst->coin));
 	textCompKeyNum->SetText(FText::AsNumber(gameInst->key));
+
+	//heartbeatSound->Stop();
+
+	playerController = GetWorld()->GetFirstPlayerController();
+
+	
 }
 
 // Called every frame
@@ -191,10 +223,22 @@ void AVR_Player::Tick(float DeltaTime)
 		}
 		throwDirection = motionControllerRight->GetComponentLocation() - prevLocation;
 
-		if (throwDirection.Length() > 2)
+		if (throwDirection.Length() > 30)
 		{
 			swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			swordCapsuleComp->SetHiddenInGame(false);
+			if (!swordAudio->IsPlaying())
+			{
+				swordAudio->Play(0);
+			}
+			
+
+// 			soundTime += DeltaTime;
+// 			if (soundTime > playTime)
+// 			{
+// 				UGameplayStatics::PlaySound2D(GetWorld(), swordSound);
+// 				soundTime = 0;
+// 			}
 		}
 		else
 		{
@@ -219,12 +263,17 @@ void AVR_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	if (enhancedInputComponent != nullptr)
 	{
 		enhancedInputComponent->BindAction(leftInputs[0], ETriggerEvent::Started, this, &AVR_Player::OpenStatsUI);
+		enhancedInputComponent->BindAction(buttonB, ETriggerEvent::Started, this, &AVR_Player::EquipSword);
+		enhancedInputComponent->BindAction(rightThumbStick, ETriggerEvent::Started, this, &AVR_Player::Recenter);
+
 		moveComp->SetupPlayerInputComponent(enhancedInputComponent);
-		equipComp->SetupPlayerInputComponent(enhancedInputComponent);
+// 		equipComp->SetupPlayerInputComponent(enhancedInputComponent);
 		graspComp->SetupPlayerInputComponent(enhancedInputComponent);
 		widgetPointerComp->SetupPlayerInputComponent(enhancedInputComponent);
 		climbComp->SetupPlayerInputComponent(enhancedInputComponent);
 		buyComp->SetupPlayerInputComponent(enhancedInputComponent);
+
+
 	}
 }
 
@@ -232,7 +281,8 @@ void AVR_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	swordAttackDmg += gameInst->swordDmg;
-
+	GetWorld()->SpawnActor<AActor>(hitEffect, OverlappedComponent->GetComponentTransform());
+	playerController->SetHapticsByValue(1.0f, 1.0f, EControllerHand::Right);
 	if (FMath::RandRange(1, 100) <= gameInst->swordCrit)
 	{
 		swordAttackDmg *= 2;
@@ -273,13 +323,28 @@ void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* O
 		GetWorld()->DestroyActor(OtherActor);
 	
 	}
+
+	AEnemy_5* enemy_5 = Cast<AEnemy_5>(OtherActor);
+	if (enemy_5 != nullptr)
+	{
+		enemy_5->fsm->OnDamageProcess(swordAttackDmg);
+	}
 }
 
 void AVR_Player::ReceiveDamage()
 {
+	if (FMath::RandRange(1, 100) <= gameInst->evasion)
+	{
+		return;
+	}
 	gameInst->hp--;
 	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 0.3f, 0.3, FLinearColor::Red);	
 	textCompHpNum->SetText(FText::AsNumber(gameInst->hp));
+
+	if (gameInst->hp < 3 && !heartbeatSound->IsPlaying())
+	{		
+		heartbeatSound->Play(0);
+	}
 
 	if (gameInst->hp < 1)
 	{		
@@ -292,11 +357,16 @@ void AVR_Player::EatFood(UPrimitiveComponent* OverlappedComponent, AActor* Other
 {
 	APickUpFood* food = Cast<APickUpFood>(OtherActor);
 	if (food != nullptr)
-	{
-		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 0.3f, 0.3, FLinearColor::Green);
+	{	
+		UGameplayStatics::PlaySound2D(GetWorld(),eatingSound);
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 0.3f, 0.5, FLinearColor::Green);
 		GetWorld()->DestroyActor(food);
 		gameInst->hp++;
 		textCompHpNum->SetText(FText::AsNumber(gameInst->hp));
+		if (gameInst->hp > 2)
+		{
+			heartbeatSound->Stop();
+		}
 	}
 }
 
@@ -305,16 +375,35 @@ void AVR_Player::OpenStatsUI()
 	if (!bShowStatsUI)
 	{
 		statsUIActor = GetWorld()->SpawnActor<AStatsUIActor>(statsUIActorFactory, GetActorTransform());
-		statsUIActor->SetActorRotation(FRotator(0,0,0));
+		UGameplayStatics::PlaySound2D(GetWorld(), openUISound);
+		widgetPointer_right->bShowDebug = true;
 		bShowStatsUI = true;
 	}
 	else
 	{
 		GetWorld()->DestroyActor(statsUIActor);
+		widgetPointer_right->bShowDebug = false;
 		bShowStatsUI = false;
 	}
 }
 
+void AVR_Player::EquipSword()
+{
+	if (isEquippingSword)
+	{
+		isEquippingSword = false;
+		sword->SetVisibility(isEquippingSword);
 
+	}
+	else if (!isEquippingSword && !graspComp->bIsGrab && !climbComp->bClimbing_right)
+	{
+		isEquippingSword = true;
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), equipSound, rightHand->GetComponentLocation());
+		sword->SetVisibility(isEquippingSword);
+	}
+}
 
-
+void AVR_Player::Recenter()
+{
+	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+}

@@ -7,6 +7,7 @@
 #include "VR_Player.h"
 #include "ClimbComponent.h"
 #include "GraspComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values for this component's properties
 UEquipComponent::UEquipComponent()
@@ -51,6 +52,7 @@ void UEquipComponent::EquipSword()
 	else if(!isEquippingSword && !player->graspComp->bIsGrab && !player->climbComp->bClimbing_right)
 	{
 		isEquippingSword = true;
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), equipSound, player->rightHand->GetComponentLocation());
 		player->sword->SetVisibility(isEquippingSword);
 	}
 }

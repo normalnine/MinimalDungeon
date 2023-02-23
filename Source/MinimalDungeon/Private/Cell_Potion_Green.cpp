@@ -15,10 +15,6 @@ ACell_Potion_Green::ACell_Potion_Green()
 
 void ACell_Potion_Green::PotionEffect()
 {
-	if (gameInst->coin >= price)
-	{
-		gameInst->knifeDmg += 5;
-		gameInst->coin -= price;
-		GetWorld()->DestroyActor(this);
-	}
+	gameInst->knifeDmg += 5;
+	
 }

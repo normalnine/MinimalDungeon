@@ -15,11 +15,6 @@ ACell_Potion_Gray::ACell_Potion_Gray()
 }
 
 void ACell_Potion_Gray::PotionEffect()
-{
-	if (gameInst->coin >= price)
-	{
-		gameInst->evasion += 1;
-		gameInst->coin-=price;
-		GetWorld()->DestroyActor(this);
-	}	
+{	
+	gameInst->evasion += 1;
 }

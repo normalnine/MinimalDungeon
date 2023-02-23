@@ -10,13 +10,17 @@
 AStatsUIActor::AStatsUIActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	rootComp = CreateDefaultSubobject<USceneComponent>(TEXT("Root Component"));
 	SetRootComponent(rootComp);
 
 	widgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("Widget Component"));
 	widgetComp->SetupAttachment(rootComp);
+
+	widgetComp_Controller = CreateDefaultSubobject<UWidgetComponent>(TEXT("Controller Widget Component"));
+	widgetComp_Controller->SetupAttachment(rootComp);
+
 }
 
 // Called when the game starts or when spawned

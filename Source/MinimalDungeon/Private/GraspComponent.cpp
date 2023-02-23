@@ -14,6 +14,7 @@
 #include "PickUpFood.h"
 #include <UMG/Public/Components/WidgetComponent.h>
 #include "PickUpBomb.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values for this component's properties
 UGraspComponent::UGraspComponent()
@@ -138,6 +139,7 @@ void UGraspComponent::GrapObject(UStaticMeshComponent* selectHand)
 			}
 
 			hitInfo.GetActor()->AttachToComponent(selectHand, FAttachmentTransformRules::KeepWorldTransform);
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), graspSound, player->leftHand->GetComponentLocation());
 			grabedObject->SetActorRotation(selectHand->GetComponentRotation());
 
 			food = Cast<APickUpFood>(grabedObject);
@@ -188,6 +190,7 @@ void UGraspComponent::ReleaseObject(UStaticMeshComponent* selectHand)
 		//GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Yellow, FString::Printf(TEXT("%.3f, %.3f, %.3f"), throwDirection.X, throwDirection.Y, throwDirection.Z));
 		if (grabedObject == knife)
 		{
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), throwSound, player->leftHand->GetComponentLocation());
 			grabedObject->sphereComp->AddImpulse(throwDirection * 10000);
 		}
 		else
@@ -207,7 +210,7 @@ void UGraspComponent::ReleaseObject(UStaticMeshComponent* selectHand)
 		if (bomb != nullptr)
 		{
 			FTimerHandle exploTimer;
-			GetWorld()->GetTimerManager().SetTimer(exploTimer,bomb,&APickUpBomb::Explode, 3.0f, false);
+			GetWorld()->GetTimerManager().SetTimer(exploTimer,bomb,&APickUpBomb::Explode, 2.0f, false);
 		}
 		
 		DrawDebugLine(GetWorld(), selectHand->GetComponentLocation(), selectHand->GetComponentLocation() + throwDirection * 50, FColor::Red, false, -1, 0, 3);
@@ -229,12 +232,17 @@ void UGraspComponent::DrawGrabRange()
 
 void UGraspComponent::EquipKnife()
 {	
-	if (isEquippingKnife)
+	if (isEquippingKnife && knife != nullptr)
 	{
 		knife->sphereComp->SetSimulatePhysics(false);
 		FVector dir = player->leftHand->GetComponentLocation() - knife->GetActorLocation();
 		dir.GetSafeNormal();
 		FVector p = knife->GetActorLocation() + dir * returnSpeed * GetWorld()->DeltaTimeSeconds;
+		if (grabedObject == nullptr)
+		{
+			player->playerController->SetHapticsByValue(1.0f, 1.0f, EControllerHand::Left);
+
+		}
 		knife->SetActorLocation(p);
 	}
 	else
@@ -242,6 +250,7 @@ void UGraspComponent::EquipKnife()
 		if (!(bIsGrab))
 		{
 			isEquippingKnife = true;
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), equipSound, player->leftHand->GetComponentLocation());
 			knife = GetWorld()->SpawnActor<AKnife>(knifeFactory, player->leftHand->GetComponentTransform());
 		}
 

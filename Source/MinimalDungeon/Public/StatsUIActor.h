@@ -30,5 +30,8 @@ public:
 	class UWidgetComponent* widgetComp;
 
 	UPROPERTY(EditAnywhere)
+	class UWidgetComponent* widgetComp_Controller;
+
+	UPROPERTY(EditAnywhere)
 	class UStatsUI* statsUI;
 };

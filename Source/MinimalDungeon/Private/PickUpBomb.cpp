@@ -12,6 +12,7 @@
 #include "Enemy_3_FSM.h"
 #include "Enemy_4_FSM.h"
 #include <Components/SkeletalMeshComponent.h>
+#include <Kismet/GameplayStatics.h>
 
 APickUpBomb::APickUpBomb()
 {
@@ -32,13 +33,15 @@ void APickUpBomb::Explode()
 	{
 		return;
 	}
+	GetWorld()->SpawnActor<AActor>(exploEffect, GetActorTransform());
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), exploSound, GetActorLocation());
 	FVector Center = GetActorLocation();
 	TArray<struct FHitResult> HitResults;
 	FCollisionQueryParams params;
 	FName ProfileName = "Enemy";
 	if (GetWorld()->SweepMultiByProfile(HitResults, Center, Center, FQuat::Identity, ProfileName, FCollisionShape::MakeSphere(exploDistance)))
 	{
-		DrawDebugSphere(GetWorld(), Center, exploDistance, 30, FColor::Cyan, false, 5, 0, 1);
+		//DrawDebugSphere(GetWorld(), Center, exploDistance, 30, FColor::Cyan, false, 5, 0, 1);
 
 		for (auto& HitResult : HitResults)
 		{
