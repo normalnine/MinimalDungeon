@@ -65,8 +65,7 @@ void UBuyComponent::BuyCellProb(UStaticMeshComponent* selectHand)
 	FName profileName = FName(TEXT("CellProb"));
 	FCollisionQueryParams params;
 	params.AddIgnoredActor(player);
-	//GetWorld()->SweepSingleByProfile(hitInfo, Center, Center, FQuat::Identity, FName(*profileName), FCollisionShape::MakeSphere(grapDistance), params)
-	DrawDebugSphere(GetWorld(), Center, 10.0f, 30, FColor::Cyan, false, -1, 0, 1);
+	//DrawDebugSphere(GetWorld(), Center, 10.0f, 30, FColor::Cyan, false, -1, 0, 1);
 
 	if (GetWorld()->SweepSingleByProfile(hitInfo, Center, Center, FQuat::Identity, profileName, FCollisionShape::MakeSphere(10), params))
 	{
@@ -83,9 +82,6 @@ void UBuyComponent::BuyCellProb(UStaticMeshComponent* selectHand)
 				GetWorld()->DestroyActor(cellProb);
 				player->textCompCoinNum->SetText(FText::AsNumber(gameInst->coin));
 			}
-			
-			//UGameplayStatics::PlaySound2D(GetWorld(), buffSound);
-			
 		}
 	}
 }
