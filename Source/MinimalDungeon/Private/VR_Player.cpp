@@ -45,7 +45,11 @@
 #include "Engine/GameViewportClient.h"
 #include "GameFramework/PlayerController.h"
 #include <Haptics/HapticFeedbackEffect_Base.h>
-
+#include "Engine/World.h"
+#include "DamageUIActor.h"
+#include "DamageUI.h"
+#include <UMG/Public/Components/WidgetComponent.h>
+#include <UMG/Public/Components/TextBlock.h>
 
 // Sets default values
 AVR_Player::AVR_Player()
@@ -295,24 +299,32 @@ void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* O
 	AEnemy_1* enemy_1 =  Cast<AEnemy_1>(OtherActor);
 	if (enemy_1 != nullptr)
 	{
+		SpawnDamageUI(OtherActor);
 		enemy_1->fsm->OnDamageProcess(swordAttackDmg);
+		
+
+		
 	}
 
 	AEnemy_2* enemy_2 = Cast<AEnemy_2>(OtherActor);
 	if (enemy_2 != nullptr)
-	{
+	{	
+		SpawnDamageUI(OtherActor);
 		enemy_2->fsm->OnDamageProcess(swordAttackDmg);
+		
 	}
 
 	AEnemy_3* enemy_3 = Cast<AEnemy_3>(OtherActor);
 	if (enemy_3 != nullptr)
-	{
+	{	
+		SpawnDamageUI(OtherActor);
 		enemy_3->fsm->OnDamageProcess(swordAttackDmg);
 	}
 
 	AEnemy_4* enemy_4 = Cast<AEnemy_4>(OtherActor);
 	if (enemy_4 != nullptr)
 	{
+		SpawnDamageUI(OtherActor);
 		enemy_4->fsm->OnDamageProcess(swordAttackDmg);
 	}
 
@@ -327,8 +339,10 @@ void AVR_Player::SwordAttack(UPrimitiveComponent* OverlappedComponent, AActor* O
 	AEnemy_5* enemy_5 = Cast<AEnemy_5>(OtherActor);
 	if (enemy_5 != nullptr)
 	{
+		SpawnDamageUI(OtherActor);
 		enemy_5->fsm->OnDamageProcess(swordAttackDmg);
 	}
+	swordAttackDmg = 0;
 }
 
 void AVR_Player::ReceiveDamage()
@@ -347,9 +361,11 @@ void AVR_Player::ReceiveDamage()
 	}
 
 	if (gameInst->hp < 1)
-	{		
-		gameInst->StatsInit();
-		UGameplayStatics::OpenLevel(GetWorld(), TEXT("TestMap"));
+	{	
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.5f);
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 1.0f, 1.0f, FLinearColor::Red);
+		FTimerHandle deathTimer;
+		GetWorldTimerManager().SetTimer(deathTimer, this, &AVR_Player::Die, 1.5f);		
 	}
 }
 
@@ -407,3 +423,32 @@ void AVR_Player::Recenter()
 {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
+
+void AVR_Player::Die()
+{
+	gameInst->StatsInit();
+	UGameplayStatics::OpenLevel(GetWorld(), TEXT("/Script/Engine.World'/Game/StylizedDungeonVol2/Maps/Demo_Map_1.Demo_Map_1'"));
+}
+
+
+
+void AVR_Player::SpawnDamageUI(AActor* OtherActor)
+{
+	FVector dir = GetActorLocation() - OtherActor->GetActorLocation();
+	dir.Normalize();
+	damageUIActor = GetWorld()->SpawnActor<ADamageUIActor>(damageUIActorFactory, OtherActor->GetActorLocation(), dir.Rotation());
+	damageUI = Cast<UDamageUI>(damageUIActor->widgetComp->GetWidget());
+	if (FMath::RandRange(1, 100) <= gameInst->swordCrit)
+	{
+		swordAttackDmg *= 2;
+		damageUI->damage->SetColorAndOpacity(FLinearColor(1.0f, 0.0f, 0.0f));
+	}
+	else
+	{
+		swordAttackDmg = FMath::RandRange(swordAttackDmg / 2, swordAttackDmg);
+		damageUI->damage->SetColorAndOpacity(FLinearColor(1.0f, 1.0f, 0.0f));
+
+	}
+	damageUI->damage->SetText(FText::AsNumber(swordAttackDmg));
+}
+

@@ -37,10 +37,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UMD_GameInstance* gameInst;
 
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UButton* _giveup;
 
-	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	class UButton* _gomain;
 
 	UFUNCTION()
