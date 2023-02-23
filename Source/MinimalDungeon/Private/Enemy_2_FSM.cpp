@@ -153,7 +153,9 @@ void UEnemy_2_FSM::OnDamageProcess(int32 damage)
 
 	//체력감소
 	hp -= damage;
-	
+	me->dam = true;
+	showdamage = damage;
+
 	//체력이 남아있다면
 	if (hp > 0)
 	{

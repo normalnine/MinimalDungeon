@@ -14,6 +14,7 @@
 #include <Kismet/KismetMathLibrary.h>
 #include <Engine/EngineTypes.h>
 #include "GameFramework/Actor.h"
+#include <Engine/World.h>
 
 // Sets default values for this component's properties
 UEnemy_1_FSM::UEnemy_1_FSM()
@@ -128,25 +129,25 @@ void UEnemy_1_FSM::MoveState()
 	//시야에 들어왔다면
 	if (bTrace)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("trace"));
+		//UE_LOG(LogTemp, Warning, TEXT("trace"));
 		//만약에 target - me 거리가 공격범위보다 작으면
 		if (dir.Length() < attackRange)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("change attack"));
+			//UE_LOG(LogTemp, Warning, TEXT("change attack"));
 			//상태를 Attack 으로 변경
 			ChangeState(EEnemyState::Attack);
 		}
 		//그렇지 않으면
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("movetotarget"));
+			//UE_LOG(LogTemp, Warning, TEXT("movetotarget"));
 			ai->MoveToLocation(target->GetActorLocation());
 		}
 	}
 	//시야에 들어오지 않았다면
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("movetorandpos"));
+		//UE_LOG(LogTemp, Warning, TEXT("movetorandpos"));
 		// 랜덤한 위치까지 도착한 후 Idle 상태로 전환
 		MoveToPos(randPos);
 	}
@@ -222,7 +223,11 @@ void UEnemy_1_FSM::OnDamageProcess(int32 damage)
 	//체력감소
 	hp -= damage;
 	UGameplayStatics::PlaySound2D(GetWorld(), hitonSound);
-	dam = true;
+	me->dam = true;
+	showdamage = damage;
+
+
+
 	//체력이 남아있다면
 	if (hp > 0)
 	{

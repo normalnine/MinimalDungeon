@@ -19,4 +19,7 @@ class MINIMALDUNGEON_API AEnemy_5 : public AEnemyF
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
 		class UEnemy_5_FSM* fsm;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		bool dam = false;
+
 };

@@ -31,4 +31,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = Extras)
 		class UArrowComponent* Arrow1P;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		bool dam = false;
+
 };

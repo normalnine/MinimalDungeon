@@ -231,6 +231,8 @@ void UEnemy_3_FSM::OnDamageProcess(int32 damage)
 	hp -= damage;
 	UGameplayStatics::PlaySound2D(GetWorld(), hitonSound);
 	dam = true;
+//	me->dam = true;
+	showdamage = damage;
 
 	if (hp > 0)
 	{
@@ -268,7 +270,7 @@ void UEnemy_3_FSM::OnDamageProcess(int32 damage)
 		anim->PlayDamageAnim(TEXT("Die"));
 		//죽으면 코인 스폰
 		FTransform dropPos = me->GetTransform();
-		GetWorld()->SpawnActor<ACoin>(DropFactory, dropPos);
+		GetWorld()->SpawnActor<AActor>(DropFactory, dropPos);
 		//시간지나면 디스트로이하기
 		FTimerHandle ddd;
 		GetWorld()->GetTimerManager().SetTimer(ddd, this, &UEnemy_3_FSM::destroyme, 4.0f, false);

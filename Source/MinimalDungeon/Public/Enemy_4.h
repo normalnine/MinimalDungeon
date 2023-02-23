@@ -17,4 +17,7 @@ public:
 		AEnemy_4();
 		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FSMComponent)
 			class UEnemy_4_FSM* fsm;
+
+		UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+			bool dam = false;
 };

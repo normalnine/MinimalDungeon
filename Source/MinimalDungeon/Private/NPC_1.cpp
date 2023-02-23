@@ -8,7 +8,7 @@ ANPC_1::ANPC_1()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	ConstructorHelpers::FObjectFinder<USkeletalMesh>tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Quinn_Simple.SKM_Quinn_Simple'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh>tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/LJW/NPC/C/PT_Medieval_Priest_StPatrick.PT_Medieval_Priest_StPatrick'"));
 	//데이터 로드 성공하면
 	if (tempMesh.Succeeded())
 	{

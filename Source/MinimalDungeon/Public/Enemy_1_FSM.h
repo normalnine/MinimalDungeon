@@ -148,5 +148,7 @@ public:
 		class USoundBase* hitonSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FSM)
-		bool dam = false;
+		int32 showdamage =0;
+
+
 };

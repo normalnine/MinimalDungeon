@@ -95,5 +95,8 @@ public:
 	// 랜덤 위치 가져오기
 	bool GetRandomPositionInNavMesh(FVector centerLocation, float radius, FVector& dest);
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FSM)
+		int32 showdamage = 0;
 	
 };
