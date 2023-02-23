@@ -99,12 +99,13 @@ void UEnemy_3_FSM::IdleState()
 	//시야에 들어오면 움직이기 시작
 	if (IsTargetTrace())
 	{
+		UE_LOG(LogTemp,Warning,TEXT("see"));
 		ChangeState(EEnemy3State::Move);
 	}
 
 	else
 	{
-			
+		UE_LOG(LogTemp, Warning, TEXT("nosee"));
 		if (IsWaitComplete(idleDelayTime))
 		{
 			
@@ -132,7 +133,7 @@ void UEnemy_3_FSM::MoveState()
 	//시야에 들어왔다면
 	else if (bTrace)
 	{
-	
+		UE_LOG(LogTemp, Warning, TEXT("movesee"));
 
 		//target - me 거리가 공격범위보다 작으면
 		if (dir.Length() < attackRange)
@@ -150,7 +151,7 @@ void UEnemy_3_FSM::MoveState()
 	//시야에 들어오지 않았다면
 	else
 	{
-	
+		UE_LOG(LogTemp, Warning, TEXT("moveNOsee"));
 		MoveToPos(randPos);
 	}
 }
@@ -314,7 +315,7 @@ bool UEnemy_3_FSM::IsTargetTrace()
 	float angle = UKismetMathLibrary::DegAcos(dotvalue);
 
 	//30보다 작고 적과 플레이어와의 거리가 지정한 거리보다 작으면
-	if (angle < 30 && dir.Length() < traceRange)
+	if (angle < 50 && dir.Length() < traceRange)
 	{
 
 
