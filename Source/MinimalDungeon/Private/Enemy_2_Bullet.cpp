@@ -67,7 +67,7 @@ void AEnemy_2_Bullet::OnOverlapBegin(class UPrimitiveComponent* selfComp, class 
 	//UEFSM* enemy = Cast<UEFSM>(otherActor);
 	if (target != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("OverLap 1"));
+		//UE_LOG(LogTemp, Warning, TEXT("OverLap 1"));
 		target->ReceiveDamage();
 
 	}

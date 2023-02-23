@@ -135,4 +135,7 @@ public:
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FSM)
 			bool dam = false;
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FSM)
+			int32 showdamage = 0;
 };

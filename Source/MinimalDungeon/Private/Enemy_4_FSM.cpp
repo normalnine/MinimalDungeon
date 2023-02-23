@@ -123,21 +123,21 @@ void UEnemy_4_FSM::MoveState()
 		//만약에 target - me 거리가 공격범위보다 작으면
 		if (dir.Length() < attackRange)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("change attack"));
+			//UE_LOG(LogTemp, Warning, TEXT("change attack"));
 			//상태를 Attack 으로 변경
 			ChangeState(EEnemy4State::Attack);
 		}
 		//그렇지 않으면
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("movetotarget"));
+			//UE_LOG(LogTemp, Warning, TEXT("movetotarget"));
 			ai->MoveToLocation(target->GetActorLocation());
 		}
 	}
 	//시야에 들어오지 않았다면
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("movetorandpos"));
+		//UE_LOG(LogTemp, Warning, TEXT("movetorandpos"));
 		// 랜덤한 위치까지 도착한 후 Idle 상태로 전환
 		MoveToPos(randPos);
 	}
@@ -214,7 +214,7 @@ void UEnemy_4_FSM::UpdateReturnPos()
 
 void UEnemy_4_FSM::isSleep()
 {
-	UE_LOG(LogTemp, Warning, TEXT("sleep"));
+	//UE_LOG(LogTemp, Warning, TEXT("sleep"));
 	anim->animState = mState;
 
 }
@@ -223,7 +223,8 @@ void UEnemy_4_FSM::OnDamageProcess(int32 damage)
 {
 	hp -= damage;
 	dam = true;
-	
+	//me->dam = true;
+	showdamage = damage;
 	if (hp > 0)
 	{
 		ChangeState(EEnemy4State::Damage);

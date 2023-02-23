@@ -149,10 +149,13 @@ public:
 
 	//드랍시킬아이템
 	UPROPERTY(EditDefaultsOnly, Category = DropFactory)
-		TSubclassOf<class ACoin> DropFactory;
+		TSubclassOf<class AActor> DropFactory;
 
 void destroyme();
 
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FSM)
 bool dam = false;
+
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FSM)
+int32 showdamage = 0;
 };

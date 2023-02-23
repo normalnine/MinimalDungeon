@@ -77,7 +77,7 @@ void UEnemy_5_FSM::IdleState()
 {
 	// 1. 시간이 흘렀으니까
 	currentTime += GetWorld()->DeltaTimeSeconds;
-	UE_LOG(LogTemp, Warning, TEXT("idle"));
+	//UE_LOG(LogTemp, Warning, TEXT("idle"));
 	// 2. 만약 경과 시간이 대기 시간을 초과했다면
 	if (currentTime > idleDelayTime)
 	{
@@ -95,7 +95,7 @@ void UEnemy_5_FSM::IdleState()
 
 void UEnemy_5_FSM::MoveState()
 {
-	UE_LOG(LogTemp, Warning, TEXT("start move"));
+	//UE_LOG(LogTemp, Warning, TEXT("start move"));
 	// 1. 타깃 목적지가 필요하다.
 	FVector destination = target->GetActorLocation();
 	// 2. 방향이 필요하다.
@@ -125,7 +125,7 @@ void UEnemy_5_FSM::MoveState()
 	else
 	{
 		// 랜덤 위치로 이동
-		UE_LOG(LogTemp, Warning, TEXT("moveto randompos"));
+		//UE_LOG(LogTemp, Warning, TEXT("moveto randompos"));
 		auto result = ai->MoveToLocation(randomPos);
 		// 목적지에 도착하면
 		if (result == EPathFollowingRequestResult::AlreadyAtGoal)
@@ -141,7 +141,7 @@ void UEnemy_5_FSM::MoveState()
 	{
 		// 길 찾기 기능 정지
 		ai->StopMovement();
-		UE_LOG(LogTemp, Warning, TEXT("change attack"));
+	//	UE_LOG(LogTemp, Warning, TEXT("change attack"));
 		// 2. 공격 상태로 전환하고 싶다.
 		mState = EEnemy5State::Attack;
 
@@ -152,7 +152,7 @@ void UEnemy_5_FSM::MoveState()
 
 void UEnemy_5_FSM::AttackState()
 {
-	UE_LOG(LogTemp, Warning, TEXT("attack start"));
+	//UE_LOG(LogTemp, Warning, TEXT("attack start"));
 		// 1. 시간이 흘러야 한다.
 		currentTime += GetWorld()->DeltaTimeSeconds;
 	// 2. 공격 시간이 됐으니까
@@ -220,7 +220,8 @@ void UEnemy_5_FSM::OnDamageProcess(int32 damage)
 {
 	// 체력 감소
 	hp--;
-
+	me->dam = true;
+	showdamage = damage;
 	// 만약 체력이 남아있다면
 	if (hp > 0)
 	{

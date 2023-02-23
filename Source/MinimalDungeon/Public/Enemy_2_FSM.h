@@ -71,6 +71,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FSM)
 		int32 hp = 2;
 
+
 	UPROPERTY(EditDefaultsOnly, Category = FSM)
 		float dieSpeed = 50.0f;
 
@@ -87,4 +88,7 @@ public:
 	//드랍시킬아이템
 	UPROPERTY(EditDefaultsOnly, Category = DropFactory)
 		TSubclassOf<class ACoin> DropFactory;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FSM)
+		int32 showdamage = 0;
 };
