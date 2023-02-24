@@ -297,7 +297,7 @@ bool UEnemy_1_FSM::IsTargetTrace()
 	float angle = UKismetMathLibrary::DegAcos(dotvalue);
 
 	//구한 값이 40보다 작고 적과 플레이어와의 거리가 지정한 거리보다 작으면
-	if (angle < 40 && dirSize.Size() < traceRange)
+	if (angle < 50 && dirSize.Size() < traceRange)
 	{
 
 

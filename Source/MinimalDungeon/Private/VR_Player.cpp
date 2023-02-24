@@ -363,7 +363,7 @@ void AVR_Player::ReceiveDamage()
 	if (gameInst->hp < 1)
 	{	
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.5f);
-		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 1.0f, 1.0f, FLinearColor::Red);		
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 1.0f, 2.0f, FLinearColor::Red);		
 		FTimerHandle deathTimer;
 		UGameplayStatics::PlaySound2D(GetWorld(), gameOverSound);
 
