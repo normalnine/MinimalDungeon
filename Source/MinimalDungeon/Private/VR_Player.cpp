@@ -92,7 +92,7 @@ AVR_Player::AVR_Player()
 
 	swordCapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Sword CapsuleComponent"));
 	swordCapsuleComp->SetupAttachment(motionControllerRight);
-	swordCapsuleComp->SetHiddenInGame(true);
+	//swordCapsuleComp->SetHiddenInGame(true);
 	swordCapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	swordCapsuleComp->SetGenerateOverlapEvents(true);	
@@ -230,7 +230,7 @@ void AVR_Player::Tick(float DeltaTime)
 		if (throwDirection.Length() > 30)
 		{
 			swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			swordCapsuleComp->SetHiddenInGame(false);
+			//swordCapsuleComp->SetHiddenInGame(false);
 			if (!swordAudio->IsPlaying())
 			{
 				swordAudio->Play(0);
@@ -247,13 +247,13 @@ void AVR_Player::Tick(float DeltaTime)
 		else
 		{
 			swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			swordCapsuleComp->SetHiddenInGame(true);
+			//swordCapsuleComp->SetHiddenInGame(true);
 		}
 	}
 	else
 	{
 		swordCapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		swordCapsuleComp->SetHiddenInGame(true);
+		//swordCapsuleComp->SetHiddenInGame(true);
 	}
 
 }
@@ -363,8 +363,10 @@ void AVR_Player::ReceiveDamage()
 	if (gameInst->hp < 1)
 	{	
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.5f);
-		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 1.0f, 1.0f, FLinearColor::Red);
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraFade(0, 1.0f, 1.0f, FLinearColor::Red);		
 		FTimerHandle deathTimer;
+		UGameplayStatics::PlaySound2D(GetWorld(), gameOverSound);
+
 		GetWorldTimerManager().SetTimer(deathTimer, this, &AVR_Player::Die, 1.5f);		
 	}
 }
@@ -405,17 +407,17 @@ void AVR_Player::OpenStatsUI()
 
 void AVR_Player::EquipSword()
 {
-	if (isEquippingSword)
+	if (sword->IsVisible())
 	{
-		isEquippingSword = false;
-		sword->SetVisibility(isEquippingSword);
+		//isEquippingSword = false;
+		sword->SetVisibility(false);
 
 	}
-	else if (!isEquippingSword && !graspComp->bIsGrab && !climbComp->bClimbing_right)
+	else if (!sword->IsVisible() && !graspComp->bIsGrab && !climbComp->bClimbing_right)
 	{
-		isEquippingSword = true;
+		//isEquippingSword = true;
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), equipSound, rightHand->GetComponentLocation());
-		sword->SetVisibility(isEquippingSword);
+		sword->SetVisibility(true);
 	}
 }
 

@@ -79,7 +79,7 @@ public:
 	class AKnife* knife;
 	double velocity = 0;
 	float currTime  = 0;
-	float createTime = 0.8f;
+	float createTime = 1.0f;
 	
 
 	void GripLeftAction(const struct FInputActionValue& value);

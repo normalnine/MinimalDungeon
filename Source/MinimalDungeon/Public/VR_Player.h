@@ -172,7 +172,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 		class USoundBase* equipSound;
 
-	bool isEquippingSword = true;
+	bool isEquippingSword = false;
 
 	void EquipSword();
 
@@ -187,6 +187,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 	class UAudioComponent* swordAudio;
+
+	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
+		class USoundBase* gameOverSound;
 
 // 	UPROPERTY(EditAnywhere, Category = "VR_Settings | Components")
 // 	class USoundBase* swordSound;

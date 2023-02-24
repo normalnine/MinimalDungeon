@@ -13,6 +13,8 @@
 #include "Enemy_4_FSM.h"
 #include <Components/SkeletalMeshComponent.h>
 #include <Kismet/GameplayStatics.h>
+#include "Enemy_5.h"
+#include "Enemy_5_FSM.h"
 
 APickUpBomb::APickUpBomb()
 {
@@ -56,25 +58,30 @@ void APickUpBomb::Explode()
 				AEnemy_1* enemy_1 = Cast<AEnemy_1>(HitActor);
 				if (enemy_1 != nullptr)
 				{
-					enemy_1->fsm->OnDamageProcess(1);
+					enemy_1->fsm->OnDamageProcess(10);
 				}
 
 				AEnemy_2* enemy_2 = Cast<AEnemy_2>(HitActor);
 				if (enemy_2 != nullptr)
 				{
-					enemy_2->fsm->OnDamageProcess(1);
+					enemy_2->fsm->OnDamageProcess(10);
 				}
 
 				AEnemy_3* enemy_3 = Cast<AEnemy_3>(HitActor);
 				if (enemy_3 != nullptr)
 				{
-					enemy_3->fsm->OnDamageProcess(1);
+					enemy_3->fsm->OnDamageProcess(10);
 				}
 
 				AEnemy_4* enemy_4 = Cast<AEnemy_4>(HitActor);
 				if (enemy_4 != nullptr)
 				{
-					enemy_4->fsm->OnDamageProcess(1);
+					enemy_4->fsm->OnDamageProcess(10);
+				}
+				AEnemy_5* enemy_5 = Cast<AEnemy_5>(HitActor);
+				if (enemy_5 != nullptr)
+				{
+					enemy_5->fsm->OnDamageProcess(10);
 				}
 			
 			}
